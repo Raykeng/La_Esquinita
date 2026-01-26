@@ -1,32 +1,68 @@
 <?php
-ob_start(); // Iniciar buffer para atrapar cualquier salida indeseada
-require_once __DIR__ . '/../config/db.php';
-require_once __DIR__ . '/../controllers/ProductoController.php';
-
-// Limpiar el buffer antes de enviar headers JSON
-ob_clean();
-
-header('Content-Type: application/json; charset=utf-8');
+header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+
+// Incluir la configuración de la base de datos
+require_once '../config/db.php';
 
 try {
-    if (!isset($pdo)) {
-        throw new Exception("Error de conexión a base de datos");
+    // Consulta para obtener productos con información de categoría
+    $sql = "SELECT 
+                p.id,
+                p.codigo_barras,
+                p.nombre,
+                p.descripcion,
+                p.precio_compra,
+                p.precio_venta,
+                p.stock_actual,
+                p.stock_minimo,
+                p.stock_maximo,
+                p.unidad_medida,
+                p.fecha_vencimiento,
+                p.estado,
+                c.nombre as categoria_nombre
+            FROM productos p
+            LEFT JOIN categorias c ON p.categoria_id = c.id
+            WHERE p.estado = 'activo'
+            ORDER BY p.nombre ASC";
+    
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Convertir tipos de datos para JavaScript
+    foreach ($productos as &$producto) {
+        $producto['id'] = (int)$producto['id'];
+        $producto['precio_compra'] = (float)$producto['precio_compra'];
+        $producto['precio_venta'] = (float)$producto['precio_venta'];
+        $producto['stock_actual'] = (int)$producto['stock_actual'];
+        $producto['stock_minimo'] = (int)$producto['stock_minimo'];
+        $producto['stock_maximo'] = (int)$producto['stock_maximo'];
+        
+        // Agregar campos adicionales para el POS
+        $producto['promocion'] = false;
+        $producto['descuento_manual'] = 0;
     }
-
-    $controller = new ProductoController($pdo);
-    $lista = $controller->listarProductosPOS();
-
+    
     echo json_encode([
         'success' => true,
-        'data' => $lista
+        'data' => $productos,
+        'total' => count($productos)
     ]);
-
+    
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Error de base de datos: ' . $e->getMessage()
+    ]);
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode([
         'success' => false,
-        'message' => $e->getMessage()
+        'message' => 'Error del servidor: ' . $e->getMessage()
     ]);
 }
 ?>

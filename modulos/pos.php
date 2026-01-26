@@ -140,6 +140,77 @@
     </div>
 </div>
 
+<!-- MODAL DE PAGO -->
+<div class="modal fade" id="modalCobrar" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold"><i class="fas fa-cash-register me-2"></i> Procesar Pago</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <h2 class="text-primary fw-bold" id="modal-total-pagar">Q 0.00</h2>
+                    <small class="text-muted">Total a pagar</small>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Cliente</label>
+                    <select class="form-select" id="select-cliente-venta">
+                        <option value="1">Público General</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Método de Pago</label>
+                    <div class="row g-2">
+                        <div class="col-4">
+                            <input type="radio" class="btn-check" name="metodoPago" id="pago-efectivo" value="efectivo" checked onchange="togglePagoInput('efectivo')">
+                            <label class="btn btn-outline-success w-100" for="pago-efectivo">
+                                <i class="fas fa-money-bill-wave d-block mb-1"></i>
+                                <small>Efectivo</small>
+                            </label>
+                        </div>
+                        <div class="col-4">
+                            <input type="radio" class="btn-check" name="metodoPago" id="pago-tarjeta" value="tarjeta" onchange="togglePagoInput('tarjeta')">
+                            <label class="btn btn-outline-primary w-100" for="pago-tarjeta">
+                                <i class="fas fa-credit-card d-block mb-1"></i>
+                                <small>Tarjeta</small>
+                            </label>
+                        </div>
+                        <div class="col-4">
+                            <input type="radio" class="btn-check" name="metodoPago" id="pago-vales" value="vales" onchange="togglePagoInput('vales')">
+                            <label class="btn btn-outline-warning w-100" for="pago-vales">
+                                <i class="fas fa-ticket-alt d-block mb-1"></i>
+                                <small>Vales</small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="seccion-efectivo">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Monto Recibido</label>
+                        <input type="number" class="form-control form-control-lg text-center fw-bold" 
+                               id="input-pago-recibido" placeholder="0.00" step="0.01" 
+                               oninput="calcularCambio()">
+                    </div>
+                    <div class="alert alert-info d-flex justify-content-between align-items-center">
+                        <span>Cambio:</span>
+                        <span class="fw-bold" id="lbl-cambio">Q 0.00</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success btn-lg" onclick="procesarVentaConfirmada()">
+                    <i class="fas fa-check me-2"></i> Confirmar Venta
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
     .search-bar-premium {
         border-radius: 50px;
@@ -154,13 +225,33 @@
         border-color: #0d6efd;
     }
 
-    .product-card-hover {
+    .product-card {
+        background: white;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid #e9ecef;
+        cursor: pointer;
         transition: transform 0.2s, box-shadow 0.2s;
+        height: 100%;
     }
 
-    .product-card-hover:hover {
+    .product-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
+    }
+
+    .product-badge {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        font-size: 0.7rem;
+        z-index: 1;
+    }
+
+    .product-price {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #0d6efd;
     }
 
     .scrollbar-premium::-webkit-scrollbar {
@@ -170,5 +261,14 @@
     .scrollbar-premium::-webkit-scrollbar-thumb {
         background-color: rgba(0, 0, 0, 0.1);
         border-radius: 10px;
+    }
+
+    .cart-item {
+        border-radius: 8px;
+        margin-bottom: 8px;
+    }
+
+    .text-xs {
+        font-size: 0.75rem;
     }
 </style>
