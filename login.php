@@ -60,13 +60,6 @@
                         INGRESAR <i class="fas fa-arrow-right ms-2"></i>
                     </button>
                 </div>
-
-                <div class="text-center mt-3">
-                    <p class="mb-0 text-muted">
-                        ¿No tienes cuenta? 
-                        <a href="registro.php" class="text-decoration-none fw-bold">Registrarse</a>
-                    </p>
-                </div>
             </form>
         </div>
 
