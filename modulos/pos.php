@@ -137,8 +137,8 @@
 <div class="modal fade" id="modalCobrar" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title fw-bold"><i class="fas fa-cash-register me-2"></i> Procesar Pago</h5>
+            <div class="modal-header bg-primary">
+                <h5 class="modal-title fw-bold text-white"><i class="fas fa-cash-register me-2"></i> Procesar Pago</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -157,25 +157,20 @@
                 <div class="mb-3">
                     <label class="form-label fw-bold">Método de Pago</label>
                     <div class="row g-2">
-                        <div class="col-4">
-                            <input type="radio" class="btn-check" name="metodoPago" id="pago-efectivo" value="efectivo" checked onchange="togglePagoInput('efectivo')">
+                        <div class="col-6">
+                            <input type="radio" class="btn-check" name="metodoPago" id="pago-efectivo" value="efectivo"
+                                checked onchange="togglePagoInput('efectivo')">
                             <label class="btn btn-outline-success w-100" for="pago-efectivo">
                                 <i class="fas fa-money-bill-wave d-block mb-1"></i>
                                 <small>Efectivo</small>
                             </label>
                         </div>
-                        <div class="col-4">
-                            <input type="radio" class="btn-check" name="metodoPago" id="pago-tarjeta" value="tarjeta" onchange="togglePagoInput('tarjeta')">
+                        <div class="col-6">
+                            <input type="radio" class="btn-check" name="metodoPago" id="pago-tarjeta" value="tarjeta"
+                                onchange="togglePagoInput('tarjeta')">
                             <label class="btn btn-outline-primary w-100" for="pago-tarjeta">
                                 <i class="fas fa-credit-card d-block mb-1"></i>
                                 <small>Tarjeta</small>
-                            </label>
-                        </div>
-                        <div class="col-4">
-                            <input type="radio" class="btn-check" name="metodoPago" id="pago-vales" value="vales" onchange="togglePagoInput('vales')">
-                            <label class="btn btn-outline-warning w-100" for="pago-vales">
-                                <i class="fas fa-ticket-alt d-block mb-1"></i>
-                                <small>Vales</small>
                             </label>
                         </div>
                     </div>
@@ -184,9 +179,9 @@
                 <div id="seccion-efectivo">
                     <div class="mb-3">
                         <label class="form-label fw-bold">Monto Recibido</label>
-                        <input type="number" class="form-control form-control-lg text-center fw-bold" 
-                               id="input-pago-recibido" placeholder="0.00" step="0.01" 
-                               oninput="calcularCambio()">
+                        <input type="number" class="form-control form-control-lg text-center fw-bold"
+                            id="input-pago-recibido" placeholder="0.00" step="0.01" oninput="calcularCambio()"
+                            onfocus="this.value=''">
                     </div>
                     <div class="alert alert-info d-flex justify-content-between align-items-center">
                         <span>Cambio:</span>

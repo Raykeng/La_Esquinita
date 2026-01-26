@@ -78,5 +78,47 @@ class Producto
             throw $e; // Re-lanzar para que el controller lo maneje
         }
     }
+
+    /**
+     * Actualizar un producto existente
+     */
+    public function actualizar($id, $datos)
+    {
+        try {
+            $sql = "UPDATE productos SET
+                        codigo_barras = :codigo,
+                        nombre = :nombre,
+                        categoria_id = :categoria,
+                        proveedor_id = :proveedor,
+                        precio_compra = :costo,
+                        precio_venta = :precio,
+                        stock_actual = :stock,
+                        stock_minimo = :minimo,
+                        unidad_medida = :unidad,
+                        fecha_vencimiento = :vencimiento
+                    WHERE id = :id";
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                ':id' => $id,
+                ':codigo' => $datos['codigo_barras'],
+                ':nombre' => $datos['nombre'],
+                ':categoria' => $datos['categoria_id'],
+                ':proveedor' => !empty($datos['proveedor_id']) ? $datos['proveedor_id'] : null,
+                ':costo' => !empty($datos['precio_compra']) ? $datos['precio_compra'] : 0,
+                ':precio' => $datos['precio_venta'],
+                ':stock' => !empty($datos['stock_actual']) ? $datos['stock_actual'] : 0,
+                ':minimo' => !empty($datos['stock_minimo']) ? $datos['stock_minimo'] : 5,
+                ':unidad' => $datos['unidad_medida'],
+                ':vencimiento' => !empty($datos['fecha_vencimiento']) ? $datos['fecha_vencimiento'] : null
+            ]);
+
+            return $stmt->rowCount() > 0;
+
+        } catch (PDOException $e) {
+            error_log("Error en Producto::actualizar: " . $e->getMessage());
+            throw $e;
+        }
+    }
 }
 ?>

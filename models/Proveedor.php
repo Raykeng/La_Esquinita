@@ -23,5 +23,22 @@ class Proveedor
             return [];
         }
     }
+
+    public function crear($nombre, $contacto = '', $telefono = '', $email = '')
+    {
+        try {
+            $sql = "INSERT INTO proveedores (nombre, contacto, telefono, email) VALUES (:nombre, :contacto, :telefono, :email)";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                ':nombre' => $nombre,
+                ':contacto' => $contacto,
+                ':telefono' => $telefono,
+                ':email' => $email
+            ]);
+            return $this->pdo->lastInsertId();
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
 }
 ?>

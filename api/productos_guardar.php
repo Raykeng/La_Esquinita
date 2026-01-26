@@ -30,12 +30,18 @@ try {
 
     $modelo = new Producto($pdo);
 
-    // Aquí podríamos decidir si es CREAR o EDITAR basado en si viene 'id'
+    // Decidir si es CREAR o EDITAR basado en si viene 'id'
     if (!empty($input['id'])) {
-        // TODO: Implementar Update
-        // $modelo->actualizar($input);
-        throw new Exception("Edición no implementada aún");
+        // ACTUALIZAR
+        $id = (int) $input['id'];
+        $resultado = $modelo->actualizar($id, $input);
+        if ($resultado) {
+            echo json_encode(['success' => true, 'id' => $id, 'message' => 'Producto actualizado correctamente']);
+        } else {
+            throw new Exception("No se pudo actualizar el producto");
+        }
     } else {
+        // CREAR
         $id = $modelo->crear($input);
         echo json_encode(['success' => true, 'id' => $id, 'message' => 'Producto guardado correctamente']);
     }

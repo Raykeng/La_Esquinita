@@ -11,7 +11,7 @@ $vista = isset($_GET['vista']) ? $_GET['vista'] : 'dashboard';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La Esquinita - Sistema POS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <!-- Template CSS Assets -->
     <link rel="stylesheet" href="assets/css/remixicon.css">
     <link rel="stylesheet" href="assets/css/lib/bootstrap.min.css">
@@ -43,7 +43,7 @@ $vista = isset($_GET['vista']) ? $_GET['vista'] : 'dashboard';
     </aside>
 
     <main class="dashboard-main">
-        
+
         <div class="dashboard-main-body">
 
             <div id="view-container">
@@ -73,9 +73,9 @@ $vista = isset($_GET['vista']) ? $_GET['vista'] : 'dashboard';
                 }
                 ?>
             </div>
-            
+
         </div>
-        
+
         <?php include 'layout/footer.php'; ?>
     </main>
 

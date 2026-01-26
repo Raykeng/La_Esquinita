@@ -90,10 +90,14 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold small text-uppercase text-muted">Proveedor</label>
-                            <select class="form-select" id="prod-proveedor" name="proveedor_id">
-                                <option value="">Seleccionar...</option>
-                                <!-- Dinámico -->
-                            </select>
+                            <div class="input-group">
+                                <select class="form-select" id="prod-proveedor" name="proveedor_id">
+                                    <option value="">Seleccionar...</option>
+                                    <!-- Dinámico -->
+                                </select>
+                                <button class="btn btn-outline-secondary" type="button" onclick="crearProveedorRapido()"
+                                    title="Nuevo Proveedor"><i class="fas fa-plus"></i></button>
+                            </div>
                         </div>
 
                         <!-- Precios -->

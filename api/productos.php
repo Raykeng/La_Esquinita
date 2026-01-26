@@ -21,37 +21,38 @@ try {
                 p.stock_maximo,
                 p.unidad_medida,
                 p.fecha_vencimiento,
+                p.descuento_manual,
                 p.estado,
                 c.nombre as categoria_nombre
             FROM productos p
             LEFT JOIN categorias c ON p.categoria_id = c.id
             WHERE p.estado = 'activo'
             ORDER BY p.nombre ASC";
-    
+
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
     // Convertir tipos de datos para JavaScript
     foreach ($productos as &$producto) {
-        $producto['id'] = (int)$producto['id'];
-        $producto['precio_compra'] = (float)$producto['precio_compra'];
-        $producto['precio_venta'] = (float)$producto['precio_venta'];
-        $producto['stock_actual'] = (int)$producto['stock_actual'];
-        $producto['stock_minimo'] = (int)$producto['stock_minimo'];
-        $producto['stock_maximo'] = (int)$producto['stock_maximo'];
-        
-        // Agregar campos adicionales para el POS
-        $producto['promocion'] = false;
-        $producto['descuento_manual'] = 0;
+        $producto['id'] = (int) $producto['id'];
+        $producto['precio_compra'] = (float) $producto['precio_compra'];
+        $producto['precio_venta'] = (float) $producto['precio_venta'];
+        $producto['stock_actual'] = (int) $producto['stock_actual'];
+        $producto['stock_minimo'] = (int) $producto['stock_minimo'];
+        $producto['stock_maximo'] = (int) $producto['stock_maximo'];
+
+        // Mantener el descuento manual si existe
+        $producto['descuento_manual'] = isset($producto['descuento_manual']) ? (float) $producto['descuento_manual'] : 0;
+        $producto['promocion'] = $producto['descuento_manual'] > 0;
     }
-    
+
     echo json_encode([
         'success' => true,
         'data' => $productos,
         'total' => count($productos)
     ]);
-    
+
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode([

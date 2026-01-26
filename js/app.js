@@ -73,7 +73,8 @@ async function loadProductosFromAPI() {
                 // Asegurar tipos de datos correctos
                 precio_venta: parseFloat(p.precio_venta),
                 stock_actual: parseInt(p.stock_actual),
-                descuento_manual: 0 // Campo local para la sesión actual
+                descuento_manual: parseFloat(p.descuento_manual) || 0, // Cargar desde BD
+                promocion: (parseFloat(p.descuento_manual) || 0) > 0 // Marcar como promoción si tiene descuento
             }));
 
             // Extraer categorías únicas y válidas (sin nulos)
@@ -247,8 +248,10 @@ function updatePreviewPrice(input, precioBase) {
     }
 }
 
-function guardarDescuentos() {
+async function guardarDescuentos() {
     const inputs = document.querySelectorAll('.manual-discount-input');
+    const descuentos = [];
+
     inputs.forEach(input => {
         const id = parseInt(input.dataset.id);
         const descuento = parseFloat(input.value) || 0;
@@ -257,12 +260,34 @@ function guardarDescuentos() {
         if (producto) {
             producto.descuento_manual = descuento;
             producto.promocion = descuento > 0;
+
+            // Agregar a la lista para enviar al servidor
+            descuentos.push({ id, descuento });
         }
     });
 
-    showToast('Descuentos aplicados localmente', 'success');
-    bootstrap.Modal.getInstance(document.getElementById('modalVencimientos')).hide();
+    try {
+        // Guardar en la base de datos
+        const response = await fetch('api/actualizar_descuentos.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ descuentos })
+        });
 
+        const result = await response.json();
+
+        if (result.success) {
+            showToast('Descuentos guardados permanentemente', 'success');
+        } else {
+            throw new Error(result.message);
+        }
+    } catch (error) {
+        console.error('Error guardando descuentos:', error);
+        showToast('Error al guardar descuentos: ' + error.message, 'danger');
+        return;
+    }
+
+    bootstrap.Modal.getInstance(document.getElementById('modalVencimientos')).hide();
     renderPOSGrid(APP_STATE.productos);
     renderCart();
 }
