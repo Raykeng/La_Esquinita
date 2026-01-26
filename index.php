@@ -37,7 +37,7 @@ $vista = isset($_GET['vista']) ? $_GET['vista'] : 'dashboard';
 
     <aside class="sidebar">
         <!-- Sidebar content will be loaded here -->
-        <?php include 'layout/header.php'; ?>
+        <?php include 'partials/sidebar.php'; ?>
     </aside>
 
     <main class="dashboard-main">
@@ -71,7 +71,7 @@ $vista = isset($_GET['vista']) ? $_GET['vista'] : 'dashboard';
             
         </div>
         
-        <?php include 'layout/footer.php'; ?>
+        <?php include 'partials/footer.php'; ?>
     </main>
 
 </body>
