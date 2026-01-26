@@ -29,12 +29,17 @@
     </div>
 
     <div class="sidebar-footer">
-        <div class="user-info">
-            <div class="user-avatar">M</div>
-            <div>
-                <div class="fw-bold">Marlon</div>
-                <div class="text-xs text-muted">Administrador</div>
+        <div class="user-info w-100 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+                <div class="user-avatar">M</div>
+                <div>
+                    <div class="fw-bold">Marlon</div>
+                    <div class="text-xs text-muted">Administrador</div>
+                </div>
             </div>
+            <a href="logout.php" class="text-white-50 hover-text-white" title="Cerrar Sesión">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
         </div>
     </div>
 </nav>
