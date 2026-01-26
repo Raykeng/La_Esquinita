@@ -5,10 +5,10 @@
     <div class="col-12 col-md-7 col-lg-8 d-flex flex-column h-100 bg-light border-end">
 
         <!-- BARRA SUPERIOR: Búsqueda y Filtros -->
-        <div class="p-3 bg-white border-bottom shadow-sm">
+        <div class="p-2 bg-white border-bottom shadow-sm">
             <div class="row g-2 align-items-center">
-                <div class="col-12 col-lg-5 d-flex align-items-center gap-2">
-                    <div class="input-group input-group-lg search-bar-premium flex-grow-1">
+                <div class="col-12 col-lg-4 d-flex align-items-center gap-2">
+                    <div class="input-group search-bar-premium flex-grow-1">
                         <span class="input-group-text bg-transparent border-end-0 text-primary">
                             <i class="fas fa-search"></i>
                         </span>
@@ -18,7 +18,7 @@
 
                     <!-- Botón de Alertas de Vencimiento -->
                     <button class="btn btn-warning shadow-sm position-relative rounded-circle p-0 flex-shrink-0"
-                        style="width: 48px; height: 48px;" onclick="openExpirationModal()"
+                        style="width: 36px; height: 36px;" onclick="openExpirationModal()"
                         title="Gestionar Vencimientos">
                         <i class="fas fa-exclamation-triangle text-dark"></i>
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
@@ -29,8 +29,8 @@
                 </div>
 
                 <!-- Categorías Pills -->
-                <div class="col-12 col-lg-7">
-                    <div class="d-flex gap-2 overflow-auto py-1" id="category-pills"
+                <div class="col-12 col-lg-8">
+                    <div class="d-flex gap-1 overflow-auto py-1" id="category-pills"
                         style="white-space: nowrap; -ms-overflow-style: none; scrollbar-width: none;">
                         <!-- JS inyectará botones aquí -->
                         <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
@@ -40,8 +40,8 @@
         </div>
 
         <!-- GRID DE PRODUCTOS -->
-        <div class="flex-grow-1 p-3 overflow-auto" id="products-container" style="background-color: #f0f2f5;">
-            <div class="row row-cols-2 row-cols-lg-3 row-cols-xl-4 g-3" id="pos-grid">
+        <div class="flex-grow-1 p-2 overflow-auto" id="products-container" style="background-color: #f0f2f5;">
+            <div class="row row-cols-3 row-cols-lg-4 row-cols-xl-5 g-2" id="pos-grid">
                 <!-- Se llena dinámicamente con JS -->
             </div>
         </div>
@@ -51,14 +51,14 @@
     <div class="col-12 col-md-5 col-lg-4 d-flex flex-column h-100 bg-white shadow">
 
         <!-- Header del Ticket -->
-        <div class="px-4 py-3 bg-white border-bottom d-flex justify-content-between align-items-center">
+        <div class="px-3 py-2 bg-white border-bottom d-flex justify-content-between align-items-center">
             <div>
-                <h5 class="mb-0 fw-bold text-dark"><i class="fas fa-receipt text-primary me-2"></i> Orden Current</h5>
+                <h6 class="mb-0 fw-bold text-dark"><i class="fas fa-receipt text-primary me-1"></i> Orden Current</h6>
                 <small class="text-muted" id="ticket-number">#V-NEW</small>
             </div>
-            <button class="btn btn-outline-danger btn-sm border-0 rounded-circle p-2" onclick="clearCart()"
-                title="Limpiar Carrito">
-                <i class="fas fa-trash-alt"></i>
+            <button class="btn btn-outline-danger btn-sm border-0 rounded-circle p-1" onclick="clearCart()"
+                title="Limpiar Carrito" style="width: 28px; height: 28px;">
+                <i class="fas fa-trash-alt" style="font-size: 0.7rem;"></i>
             </button>
         </div>
 
@@ -70,23 +70,23 @@
         </div>
 
         <!-- Footer: Totales y Botones -->
-        <div class="p-4 bg-light border-top mt-auto">
+        <div class="p-3 bg-light border-top mt-auto">
             <div class="d-flex justify-content-between mb-1">
-                <span class="text-muted">Subtotal</span>
-                <span class="fw-bold text-dark" id="cart-subtotal-display">Q 0.00</span>
+                <span class="text-muted small">Subtotal</span>
+                <span class="fw-bold text-dark small" id="cart-subtotal-display">Q 0.00</span>
             </div>
-            <div class="d-flex justify-content-between mb-1 text-success">
-                <span class="small"><i class="fas fa-tag"></i> Descuentos (Vencimiento)</span>
-                <span class="fw-bold" id="cart-discount-display">- Q 0.00</span>
+            <div class="d-flex justify-content-between mb-2 text-success">
+                <span class="small"><i class="fas fa-tag"></i> Descuentos</span>
+                <span class="fw-bold small" id="cart-discount-display">- Q 0.00</span>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-white rounded shadow-sm border">
-                <span class="h5 mb-0 text-muted">Total</span>
-                <span class="h2 mb-0 fw-bold text-primary" id="cart-total">Q 0.00</span>
+            <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-white rounded shadow-sm border">
+                <span class="h6 mb-0 text-muted">Total</span>
+                <span class="h4 mb-0 fw-bold text-primary" id="cart-total">Q 0.00</span>
             </div>
 
             <button
-                class="btn btn-primary w-100 btn-lg rounded-3 py-3 shadow fw-bold text-uppercase d-flex justify-content-between align-items-center"
+                class="btn btn-primary w-100 btn-lg rounded-3 py-2 shadow fw-bold text-uppercase d-flex justify-content-between align-items-center"
                 id="btn-pay" onclick="openPaymentModal()" disabled>
                 <span>Cobrar</span>
                 <span><i class="fas fa-chevron-right"></i></span>
@@ -215,31 +215,51 @@
 
     .product-card {
         background: white;
-        border-radius: 12px;
-        padding: 16px;
+        border-radius: 8px;
+        padding: 12px;
         border: 1px solid #e9ecef;
         cursor: pointer;
         transition: transform 0.2s, box-shadow 0.2s;
-        height: 100%;
+        height: 140px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
 
     .product-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
     }
 
     .product-badge {
         position: absolute;
-        top: 8px;
-        right: 8px;
-        font-size: 0.7rem;
+        top: 4px;
+        right: 4px;
+        font-size: 0.6rem;
         z-index: 1;
+        padding: 2px 6px;
     }
 
     .product-price {
-        font-size: 1.1rem;
+        font-size: 1rem;
         font-weight: bold;
         color: #0d6efd;
+    }
+
+    .product-icon {
+        font-size: 1.5rem !important;
+        margin-bottom: 8px;
+    }
+
+    .product-name {
+        font-size: 0.85rem;
+        line-height: 1.2;
+        margin-bottom: 4px;
+    }
+
+    .product-details {
+        font-size: 0.7rem;
+        margin-bottom: 4px;
     }
 
     .scrollbar-premium::-webkit-scrollbar {

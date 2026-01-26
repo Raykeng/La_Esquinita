@@ -1,41 +1,56 @@
 <?php
-/**
- * api/categorias.php
- * Endpoint para listar y crear categorías
- */
-ob_start();
-require_once __DIR__ . '/../config/db.php';
-require_once __DIR__ . '/../models/Categoria.php';
-ob_clean();
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
 
-header('Content-Type: application/json; charset=utf-8');
+require_once '../config/db.php';
 
 try {
-    $modelo = new Categoria($pdo);
-    $method = $_SERVER['REQUEST_METHOD'];
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        // Obtener todas las categorías
+        $sql = "SELECT id, nombre, descripcion FROM categorias WHERE estado = 'activo' ORDER BY nombre ASC";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();
+        $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    if ($method === 'GET') {
-        // Listar
-        $datos = $modelo->obtenerTodas();
-        echo json_encode(['success' => true, 'data' => $datos]);
-
-    } elseif ($method === 'POST') {
-        // Crear
+        echo json_encode([
+            'success' => true,
+            'data' => $categorias,
+            'total' => count($categorias)
+        ]);
+    } 
+    elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Crear nueva categoría
         $input = json_decode(file_get_contents('php://input'), true);
-        if (!$input || empty($input['nombre'])) {
-            throw new Exception("Nombre de categoría requerido");
+        $nombre = trim($input['nombre'] ?? '');
+        
+        if (empty($nombre)) {
+            throw new Exception('El nombre de la categoría es requerido');
         }
-
-        $id = $modelo->crear($input['nombre'], $input['descripcion'] ?? '');
-        if ($id) {
-            echo json_encode(['success' => true, 'id' => $id, 'message' => 'Categoría creada']);
-        } else {
-            throw new Exception("Error al crear categoría");
-        }
+        
+        $sql = "INSERT INTO categorias (nombre) VALUES (?)";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$nombre]);
+        
+        echo json_encode([
+            'success' => true,
+            'id' => $pdo->lastInsertId(),
+            'message' => 'Categoría creada correctamente'
+        ]);
     }
 
-} catch (Exception $e) {
+} catch (PDOException $e) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Error de base de datos: ' . $e->getMessage()
+    ]);
+} catch (Exception $e) {
+    http_response_code(400);
+    echo json_encode([
+        'success' => false,
+        'message' => $e->getMessage()
+    ]);
 }
 ?>

@@ -10,6 +10,20 @@ $vista = isset($_GET['vista']) ? $_GET['vista'] : 'dashboard';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La Esquinita - Sistema POS</title>
+    
+    <!-- IMPORTANTE: Define la API base antes de cargar pos.js -->
+    <script>
+        // Calcula dinámicamente la ruta base
+        const API_BASE_URL = (() => {
+            const pathname = window.location.pathname;
+            const dirs = pathname.split('/').filter(Boolean); // ['La_esquinita', 'La_Esquinita', 'index.php']
+            dirs.pop(); // Quita 'index.php'
+            return '/' + dirs.join('/') + '/'; // Devuelve: /La_esquinita/La_Esquinita/
+        })();
+        
+        console.log('🔧 API Base URL:', API_BASE_URL); // Para debugging
+    </script>
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Template CSS Assets -->
@@ -78,6 +92,23 @@ $vista = isset($_GET['vista']) ? $_GET['vista'] : 'dashboard';
         
         <?php include 'partials/footer.php'; ?>
     </main>
+
+    <!-- Scripts JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Scripts específicos por vista -->
+    <?php if ($vista === 'pos'): ?>
+        <script>
+            console.log('🚀 JavaScript del POS cargado correctamente');
+            console.log('📍 URL actual:', window.location.href);
+        </script>
+        <script src="assets/js/pos.js"></script>
+    <?php elseif ($vista === 'clientes'): ?>
+        <script src="assets/js/clientes.js"></script>
+    <?php elseif ($vista === 'caja'): ?>
+        <script src="assets/js/caja.js"></script>
+    <?php endif; ?>
 
 </body>
 

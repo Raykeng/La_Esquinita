@@ -10,6 +10,21 @@ let productos = [];
 let totalCarrito = 0;
 let descuentoTotal = 0;
 
+// Función para obtener la URL base de la API
+function getApiBaseUrl() {
+    const pathname = window.location.pathname;
+    const dirs = pathname.split('/').filter(Boolean);
+    
+    // Si termina en index.php, lo quitamos
+    if (dirs[dirs.length - 1] === 'index.php') {
+        dirs.pop();
+    }
+    
+    const baseUrl = '/' + dirs.join('/') + '/';
+    console.log('🔧 API Base URL calculada:', baseUrl);
+    return baseUrl;
+}
+
 // Inicializar POS cuando se carga la página
 document.addEventListener('DOMContentLoaded', function() {
     if (document.getElementById('pos-grid')) {
@@ -22,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
  */
 function inicializarPOS() {
     cargarProductos();
+    cargarCategorias(); // Agregar carga de categorías
     configurarBusqueda();
     configurarFiltrosCategorias();
     actualizarCarrito();
@@ -32,66 +48,173 @@ function inicializarPOS() {
  * Cargar productos desde la API
  */
 async function cargarProductos() {
+    console.log('🔄 Iniciando carga de productos...');
+    
     try {
-        const response = await fetch('api/productos.php?action=listar');
+        // Calcula la URL base dinámicamente
+        const apiBaseUrl = getApiBaseUrl();
+        const url = window.location.origin + apiBaseUrl + 'api/productos.php';
+        console.log('📡 Fetching from:', url);
+        
+        const response = await fetch(url);
+        console.log('📡 Respuesta de la API:', response);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
+        console.log('📦 Datos recibidos:', data);
         
         if (data.success) {
-            productos = data.productos;
+            productos = data.data;
+            console.log('✅ Productos cargados:', productos.length, 'productos');
             mostrarProductos(productos);
         } else {
-            console.error('Error al cargar productos:', data.message);
+            console.error('❌ Error al cargar productos:', data.message);
+            console.log('🔄 Mostrando productos de ejemplo...');
+            mostrarProductosEjemplo();
         }
     } catch (error) {
-        console.error('Error en la conexión:', error);
-        // Mostrar productos de ejemplo si falla la conexión
+        console.error('💥 Error en la conexión:', error);
+        console.log('🔄 Mostrando productos de ejemplo...');
         mostrarProductosEjemplo();
     }
 }
 
 /**
- * Mostrar productos en el grid
+ * Cargar categorías desde la API
  */
+async function cargarCategorias() {
+    try {
+        const apiBaseUrl = getApiBaseUrl();
+        const url = window.location.origin + apiBaseUrl + 'api/categorias.php';
+        console.log('📂 Cargando categorías desde:', url);
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.success) {
+            mostrarCategorias(data.data);
+        } else {
+            console.error('Error al cargar categorías:', data.message);
+            mostrarCategoriasEjemplo();
+        }
+    } catch (error) {
+        console.error('Error cargando categorías:', error);
+        mostrarCategoriasEjemplo();
+    }
+}
+
+/**
+ * Mostrar categorías en el header
+ */
+function mostrarCategorias(categorias) {
+    const container = document.getElementById('category-pills');
+    if (!container) return;
+    
+    let html = `
+        <button class="btn btn-primary btn-sm active" data-cat="">
+            <i class="fas fa-th-large me-1"></i> Todos
+        </button>
+    `;
+    
+    categorias.forEach(categoria => {
+        html += `
+            <button class="btn btn-outline-secondary btn-sm" data-cat="${categoria.nombre}">
+                <i class="fas fa-tag me-1"></i> ${categoria.nombre}
+            </button>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+/**
+ * Mostrar categorías de ejemplo
+ */
+function mostrarCategoriasEjemplo() {
+    const container = document.getElementById('category-pills');
+    if (!container) return;
+    
+    const categoriasEjemplo = ['Bebidas', 'Abarrotes', 'Frescos', 'Lácteos', 'Limpieza'];
+    
+    let html = `
+        <button class="btn btn-primary btn-sm active" data-cat="">
+            <i class="fas fa-th-large me-1"></i> Todos
+        </button>
+    `;
+    
+    categoriasEjemplo.forEach(categoria => {
+        html += `
+            <button class="btn btn-outline-secondary btn-sm" data-cat="${categoria}">
+                <i class="fas fa-tag me-1"></i> ${categoria}
+            </button>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
 function mostrarProductos(productosArray) {
+    console.log('🎨 Mostrando productos en el grid:', productosArray.length, 'productos');
     const grid = document.getElementById('pos-grid');
+    
+    if (!grid) {
+        console.error('❌ No se encontró el elemento pos-grid');
+        return;
+    }
+    
     grid.innerHTML = '';
 
-    productosArray.forEach(producto => {
+    productosArray.forEach((producto, index) => {
+        console.log(`📦 Procesando producto ${index + 1}:`, producto.nombre);
         const precioConDescuento = calcularPrecioConDescuento(producto);
         const tieneDescuento = precioConDescuento < producto.precio_venta;
         
         const card = document.createElement('div');
         card.className = 'col';
         card.innerHTML = `
-            <div class="product-card shadow-sm position-relative" onclick="agregarAlCarrito(${producto.id})">
+            <div class="product-card shadow-sm position-relative">
                 ${tieneDescuento ? '<span class="product-badge badge bg-warning">¡Oferta!</span>' : ''}
-                ${producto.stock_actual <= producto.stock_minimo ? '<span class="product-badge badge bg-danger" style="top: 8px; right: 8px;">Stock Bajo</span>' : ''}
+                ${producto.stock_actual <= producto.stock_minimo ? '<span class="product-badge badge bg-danger" style="top: 4px; left: 4px;">Stock Bajo</span>' : ''}
                 
-                <div class="text-center mb-3">
-                    <i class="fas fa-box-open text-primary" style="font-size: 2rem;"></i>
+                <div class="text-center">
+                    <i class="fas fa-box-open text-primary product-icon"></i>
                 </div>
                 
-                <h6 class="fw-bold mb-2 text-truncate" title="${producto.nombre}">${producto.nombre}</h6>
+                <h6 class="fw-bold text-truncate product-name" title="${producto.nombre}">${producto.nombre}</h6>
                 
-                <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="d-flex justify-content-between align-items-center product-details">
                     <small class="text-muted">${producto.categoria_nombre || 'Sin categoría'}</small>
                     <small class="text-muted">Stock: ${producto.stock_actual}</small>
                 </div>
                 
-                <div class="price-section">
+                <div class="price-section mb-2">
                     ${tieneDescuento ? `
-                        <div class="text-decoration-line-through text-muted small">Q ${parseFloat(producto.precio_venta).toFixed(2)}</div>
+                        <div class="text-decoration-line-through text-muted" style="font-size: 0.7rem;">Q ${parseFloat(producto.precio_venta).toFixed(2)}</div>
                         <div class="product-price text-success">Q ${precioConDescuento.toFixed(2)}</div>
                     ` : `
                         <div class="product-price">Q ${parseFloat(producto.precio_venta).toFixed(2)}</div>
                     `}
                 </div>
                 
-                ${producto.por_vencer ? '<small class="text-warning"><i class="fas fa-clock"></i> Próximo a vencer</small>' : ''}
+                <div class="d-flex justify-content-between align-items-center">
+                    <button class="btn btn-outline-danger btn-sm rounded-circle p-1" onclick="event.stopPropagation(); quitarDelCarrito(${producto.id})" style="width: 28px; height: 28px; font-size: 0.7rem;">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <span class="badge bg-primary" id="qty-${producto.id}">0</span>
+                    <button class="btn btn-outline-success btn-sm rounded-circle p-1" onclick="event.stopPropagation(); agregarAlCarrito(${producto.id})" style="width: 28px; height: 28px; font-size: 0.7rem;">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                
+                ${producto.por_vencer ? '<small class="text-warning mt-1"><i class="fas fa-clock"></i> Próximo a vencer</small>' : ''}
             </div>
         `;
         grid.appendChild(card);
     });
+    
+    console.log('✅ Grid actualizado con', productosArray.length, 'productos');
 }
 
 /**
@@ -143,9 +266,11 @@ function configurarBusqueda() {
  * Configurar filtros de categorías
  */
 function configurarFiltrosCategorias() {
-    const categoryPills = document.querySelectorAll('#category-pills button');
-    categoryPills.forEach(pill => {
-        pill.addEventListener('click', function() {
+    // Usar delegación de eventos para botones dinámicos
+    document.addEventListener('click', function(e) {
+        if (e.target.matches('#category-pills button[data-cat]')) {
+            const categoryPills = document.querySelectorAll('#category-pills button');
+            
             // Remover active de todos
             categoryPills.forEach(p => {
                 p.classList.remove('active', 'btn-primary');
@@ -153,12 +278,12 @@ function configurarFiltrosCategorias() {
             });
             
             // Activar el seleccionado
-            this.classList.add('active', 'btn-primary');
-            this.classList.remove('btn-outline-secondary');
+            e.target.classList.add('active', 'btn-primary');
+            e.target.classList.remove('btn-outline-secondary');
             
-            const categoria = this.getAttribute('data-cat');
+            const categoria = e.target.getAttribute('data-cat');
             filtrarPorCategoria(categoria);
-        });
+        }
     });
 }
 
@@ -178,8 +303,36 @@ function filtrarPorCategoria(categoria) {
 }
 
 /**
- * Agregar producto al carrito
+ * Quitar producto del carrito (botón -)
  */
+function quitarDelCarrito(productoId) {
+    const itemExistente = carrito.find(item => item.id === productoId);
+    
+    if (itemExistente) {
+        if (itemExistente.cantidad > 1) {
+            itemExistente.cantidad--;
+        } else {
+            // Si solo hay 1, eliminar completamente
+            const index = carrito.findIndex(item => item.id === productoId);
+            carrito.splice(index, 1);
+        }
+        actualizarCarrito();
+        actualizarCantidadEnTarjeta(productoId);
+    }
+}
+
+/**
+ * Actualizar la cantidad mostrada en la tarjeta del producto
+ */
+function actualizarCantidadEnTarjeta(productoId) {
+    const badge = document.getElementById(`qty-${productoId}`);
+    if (badge) {
+        const item = carrito.find(item => item.id === productoId);
+        const cantidad = item ? item.cantidad : 0;
+        badge.textContent = cantidad;
+        badge.style.display = cantidad > 0 ? 'inline' : 'none';
+    }
+}
 function agregarAlCarrito(productoId) {
     const producto = productos.find(p => p.id === productoId);
     if (!producto) return;
@@ -220,6 +373,7 @@ function agregarAlCarrito(productoId) {
     }
     
     actualizarCarrito();
+    actualizarCantidadEnTarjeta(productoId);
 }
 
 /**
@@ -290,6 +444,11 @@ function actualizarCarrito() {
     document.getElementById('cart-subtotal-display').textContent = `Q ${(totalCarrito + descuentoTotal).toFixed(2)}`;
     document.getElementById('cart-discount-display').textContent = `- Q ${descuentoTotal.toFixed(2)}`;
     document.getElementById('cart-total').textContent = `Q ${totalCarrito.toFixed(2)}`;
+    
+    // Actualizar cantidades en las tarjetas
+    productos.forEach(producto => {
+        actualizarCantidadEnTarjeta(producto.id);
+    });
 }
 
 /**
@@ -468,9 +627,10 @@ function calcularCambio() {
 async function procesarVentaConfirmada() {
     const metodoPago = document.querySelector('input[name="metodoPago"]:checked').value;
     const clienteId = document.getElementById('select-cliente-venta').value;
+    let recibido = totalCarrito; // Valor por defecto
     
     if (metodoPago === 'efectivo') {
-        const recibido = parseFloat(document.getElementById('input-pago-recibido').value) || 0;
+        recibido = parseFloat(document.getElementById('input-pago-recibido').value) || 0;
         if (recibido < totalCarrito) {
             Swal.fire({
                 icon: 'error',
@@ -486,6 +646,7 @@ async function procesarVentaConfirmada() {
         metodo_pago: metodoPago,
         total: totalCarrito,
         descuento_total: descuentoTotal,
+        monto_recibido: recibido,
         items: carrito.map(item => ({
             producto_id: item.id,
             cantidad: item.cantidad,
@@ -495,7 +656,13 @@ async function procesarVentaConfirmada() {
     };
     
     try {
-        const response = await fetch('api/ventas.php', {
+        const apiBaseUrl = getApiBaseUrl();
+        const url = window.location.origin + apiBaseUrl + 'api/ventas.php';
+        
+        console.log('🔄 Procesando venta...', ventaData);
+        console.log('📡 URL API:', url);
+        
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -503,9 +670,15 @@ async function procesarVentaConfirmada() {
             body: JSON.stringify(ventaData)
         });
         
+        console.log('📡 Respuesta HTTP:', response.status);
+        
         const result = await response.json();
+        console.log('📦 Resultado:', result);
         
         if (result.success) {
+            // Generar PDF de la factura
+            generarFacturaPDF(result);
+            
             Swal.fire({
                 icon: 'success',
                 title: 'Venta Procesada',
@@ -556,8 +729,108 @@ function aplicarDescuentoPersonalizado(productoId, porcentaje) {
 }
 
 /**
- * Mostrar productos de ejemplo si falla la conexión
+ * Generar PDF de factura
  */
+function generarFacturaPDF(ventaData) {
+    // Usar la nueva versión HTML que funciona mejor
+    const apiBaseUrl = getApiBaseUrl();
+    const facturaUrl = window.location.origin + apiBaseUrl + `api/generar_factura_html.php?venta_id=${ventaData.venta_id}`;
+    
+    // Abrir en nueva ventana
+    window.open(facturaUrl, '_blank', 'width=500,height=700,scrollbars=yes');
+}
+
+/**
+ * Mostrar vista previa de la factura
+ */
+function mostrarVistaPrevia(ventaData) {
+    const fecha = new Date().toLocaleDateString('es-GT');
+    const hora = new Date().toLocaleTimeString('es-GT');
+    
+    const contenidoFactura = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Factura #${ventaData.venta_id}</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; font-size: 14px; }
+                .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; }
+                .info { margin: 20px 0; background: #f9f9f9; padding: 15px; border-radius: 5px; }
+                .items { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                .items th, .items td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                .items th { background-color: #f2f2f2; }
+                .total { text-align: right; font-size: 16px; margin-top: 20px; }
+                .footer { margin-top: 30px; text-align: center; font-size: 12px; }
+                @media print { body { margin: 0; } }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>🏪 La Esquinita</h1>
+                <p>Sistema de Punto de Venta</p>
+                <h2>FACTURA #${String(ventaData.venta_id).padStart(6, '0')}</h2>
+            </div>
+            
+            <div class="info">
+                <p><strong>Fecha:</strong> ${fecha} ${hora}</p>
+                <p><strong>Cliente:</strong> Público General</p>
+                <p><strong>Método de Pago:</strong> ${ventaData.metodo_pago || 'Efectivo'}</p>
+            </div>
+            
+            <table class="items">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unit.</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${carrito.map(item => `
+                        <tr>
+                            <td>${item.nombre}</td>
+                            <td>${item.cantidad}</td>
+                            <td>Q ${item.precio_actual.toFixed(2)}</td>
+                            <td>Q ${(item.precio_actual * item.cantidad).toFixed(2)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+            
+            <div class="total">
+                <p>Subtotal: Q ${(totalCarrito + descuentoTotal).toFixed(2)}</p>
+                ${descuentoTotal > 0 ? `<p style="color: green;">Descuentos: - Q ${descuentoTotal.toFixed(2)}</p>` : ''}
+                <p><strong style="font-size: 18px;">TOTAL: Q ${totalCarrito.toFixed(2)}</strong></p>
+                ${ventaData.cambio > 0 ? `
+                    <p>Recibido: Q ${ventaData.monto_recibido.toFixed(2)}</p>
+                    <p>Cambio: Q ${ventaData.cambio.toFixed(2)}</p>
+                ` : ''}
+            </div>
+            
+            <div class="footer">
+                <p><strong>¡Gracias por su compra!</strong></p>
+                <p>La Esquinita - ${fecha}</p>
+            </div>
+            
+            <script>
+                // Auto-imprimir después de cargar
+                window.onload = function() {
+                    setTimeout(function() {
+                        window.print();
+                    }, 500);
+                }
+            </script>
+        </body>
+        </html>
+    `;
+    
+    // Crear ventana para vista previa e impresión
+    const ventana = window.open('', '_blank', 'width=800,height=600');
+    ventana.document.write(contenidoFactura);
+    ventana.document.close();
+}
 function mostrarProductosEjemplo() {
     productos = [
         {

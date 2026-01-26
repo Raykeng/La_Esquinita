@@ -5,7 +5,7 @@ header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
 // Incluir la configuración de la base de datos
-require_once '../config/db.php';
+require_once __DIR__ . '/../config/db.php';
 
 try {
     // Consulta para obtener productos con información de categoría
@@ -21,9 +21,15 @@ try {
                 p.stock_maximo,
                 p.unidad_medida,
                 p.fecha_vencimiento,
-                p.descuento_manual,
                 p.estado,
-                c.nombre as categoria_nombre
+                c.nombre as categoria_nombre,
+                CASE 
+                    WHEN p.fecha_vencimiento IS NOT NULL 
+                    AND DATEDIFF(p.fecha_vencimiento, CURDATE()) <= 60 
+                    AND DATEDIFF(p.fecha_vencimiento, CURDATE()) > 0
+                    THEN 1 
+                    ELSE 0 
+                END as por_vencer
             FROM productos p
             LEFT JOIN categorias c ON p.categoria_id = c.id
             WHERE p.estado = 'activo'
@@ -41,10 +47,11 @@ try {
         $producto['stock_actual'] = (int) $producto['stock_actual'];
         $producto['stock_minimo'] = (int) $producto['stock_minimo'];
         $producto['stock_maximo'] = (int) $producto['stock_maximo'];
+        $producto['por_vencer'] = (bool) $producto['por_vencer'];
 
-        // Mantener el descuento manual si existe
-        $producto['descuento_manual'] = isset($producto['descuento_manual']) ? (float) $producto['descuento_manual'] : 0;
-        $producto['promocion'] = $producto['descuento_manual'] > 0;
+        // Agregar campos por defecto
+        $producto['descuento_manual'] = 0;
+        $producto['promocion'] = false;
     }
 
     echo json_encode([
