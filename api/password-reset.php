@@ -100,7 +100,7 @@ function handlePasswordResetRequest($pdo, $input) {
     $stmt->execute([$user['id'], $token, $expires]);
     
     // Generar link de recuperación
-    $resetLink = "http://localhost/La_Esquinita/nueva_clave.php?token=" . $token;
+    $resetLink = "http://localhost/La_Esquinita/La_Esquinita/nueva_clave.php?token=" . $token;
     
     echo json_encode([
         'success' => true,
