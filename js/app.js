@@ -241,7 +241,10 @@ function updatePreviewPrice(input, precioBase) {
     const descuento = parseFloat(input.value) || 0;
     const nuevoPrecio = precioBase * (1 - (descuento / 100));
     const row = input.closest('tr');
-    row.querySelector('.preview-price-cell').innerText = `Q ${nuevoPrecio.toFixed(2)}`;
+    const priceCell = row.querySelector('.preview-price-cell');
+    if (priceCell) {
+        priceCell.innerText = `Q ${nuevoPrecio.toFixed(2)}`;
+    }
 }
 
 function guardarDescuentos() {
@@ -333,7 +336,11 @@ function renderCart() {
     const totalEl = document.getElementById('cart-total');
     const btnPay = document.getElementById('btn-pay');
 
-    if (!container || !totalEl || !btnPay) return;
+    if (!container || !totalEl || !btnPay) {
+        // [MERGE] Aceptamos el warning del remoto, es útil.
+        console.warn('Elementos del carrito no encontrados en el DOM');
+        return;
+    }
 
     if (APP_STATE.carrito.length === 0) {
         container.innerHTML = `
@@ -343,6 +350,7 @@ function renderCart() {
             </div>`;
         totalEl.innerText = 'Q 0.00';
 
+        // [MERGE] Mantenemos nuestra lógica robusta que incluye TAX (el remoto no lo tenía)
         const sub = document.getElementById('cart-subtotal-display');
         if (sub) sub.innerText = 'Q 0.00';
 
@@ -395,10 +403,15 @@ function renderCart() {
         `;
     }).join('');
 
-    document.getElementById('cart-subtotal-display').innerText = `Q ${(total + totalDescuento).toFixed(2)}`;
-    document.getElementById('cart-discount-display').innerText = `- Q ${totalDescuento.toFixed(2)}`;
+    // Verificar si existen antes de actualizar
+    const subtotalEl = document.getElementById('cart-subtotal-display');
+    const discountEl = document.getElementById('cart-discount-display');
+    const taxEl = document.getElementById('cart-tax-display');
+
+    if (subtotalEl) subtotalEl.innerText = `Q ${(total + totalDescuento).toFixed(2)}`;
+    if (discountEl) discountEl.innerText = `- Q ${totalDescuento.toFixed(2)}`;
     totalEl.innerText = `Q ${total.toFixed(2)}`;
-    document.getElementById('cart-tax-display').innerText = `Q ${(total * 0.12).toFixed(2)}`;
+    if (taxEl) taxEl.innerText = `Q ${(total * 0.12).toFixed(2)}`;
 }
 
 function updateQty(index, change) {
@@ -436,7 +449,8 @@ function openPaymentModal() {
         return sum + (precioFinal * item.cantidad);
     }, 0);
 
-    document.getElementById('modal-total-pagar').innerText = `Q ${totalVentaActual.toFixed(2)}`;
+    const totalEl = document.getElementById('modal-total-pagar');
+    if (totalEl) totalEl.innerText = `Q ${totalVentaActual.toFixed(2)}`;
 
     // Hardcoded clientes
     const clientes = [
@@ -456,8 +470,11 @@ function openPaymentModal() {
     const rbEfectivo = document.getElementById('pago-efectivo');
     if (rbEfectivo) rbEfectivo.click();
 
-    new bootstrap.Modal(document.getElementById('modalCobrar')).show();
-    setTimeout(() => document.getElementById('input-pago-recibido')?.focus(), 500);
+    const modalEl = document.getElementById('modalCobrar');
+    if (modalEl) {
+        new bootstrap.Modal(modalEl).show();
+        setTimeout(() => document.getElementById('input-pago-recibido')?.focus(), 500);
+    }
 }
 
 function togglePagoInput(metodo) {
@@ -469,14 +486,19 @@ function togglePagoInput(metodo) {
         setTimeout(() => document.getElementById('input-pago-recibido')?.focus(), 100);
     } else {
         seccionEfectivo.style.display = 'none';
-        document.getElementById('lbl-cambio').innerText = 'Q 0.00';
+        const lblCambio = document.getElementById('lbl-cambio');
+        if (lblCambio) lblCambio.innerText = 'Q 0.00';
     }
 }
 
 function calcularCambio() {
-    const recibido = parseFloat(document.getElementById('input-pago-recibido').value) || 0;
-    const cambio = recibido - totalVentaActual;
+    const inputEl = document.getElementById('input-pago-recibido');
     const lbl = document.getElementById('lbl-cambio');
+
+    if (!inputEl || !lbl) return;
+
+    const recibido = parseFloat(inputEl.value) || 0;
+    const cambio = recibido - totalVentaActual;
 
     if (cambio >= 0) {
         lbl.innerText = `Q ${cambio.toFixed(2)}`;
