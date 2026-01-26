@@ -5,12 +5,13 @@ $vista = isset($_GET['vista']) ? $_GET['vista'] : 'dashboard';
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La Esquinita - Sistema POS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <!-- Template CSS Assets -->
     <link rel="stylesheet" href="assets/css/remixicon.css">
     <link rel="stylesheet" href="assets/css/lib/bootstrap.min.css">
@@ -33,6 +34,7 @@ $vista = isset($_GET['vista']) ? $_GET['vista'] : 'dashboard';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
     <aside class="sidebar">
@@ -41,7 +43,7 @@ $vista = isset($_GET['vista']) ? $_GET['vista'] : 'dashboard';
     </aside>
 
     <main class="dashboard-main">
-        
+
         <div class="dashboard-main-body">
 
             <div id="view-container">
@@ -52,6 +54,9 @@ $vista = isset($_GET['vista']) ? $_GET['vista'] : 'dashboard';
                         break;
                     case 'pos':
                         include 'modulos/pos.php';
+                        break;
+                    case 'productos':
+                        include 'modulos/productos.php';
                         break;
                     case 'inventario':
                         include 'modulos/inventario.php';
@@ -68,11 +73,12 @@ $vista = isset($_GET['vista']) ? $_GET['vista'] : 'dashboard';
                 }
                 ?>
             </div>
-            
+
         </div>
         
         <?php include 'partials/footer.php'; ?>
     </main>
 
 </body>
+
 </html>

@@ -7,7 +7,7 @@
         <!-- BARRA SUPERIOR: Búsqueda y Filtros -->
         <div class="p-3 bg-white border-bottom shadow-sm">
             <div class="row g-2 align-items-center">
-                <div class="col-12 col-lg-6 d-flex align-items-center gap-3">
+                <div class="col-12 col-lg-5 d-flex align-items-center gap-2">
                     <div class="input-group input-group-lg search-bar-premium flex-grow-1">
                         <span class="input-group-text bg-transparent border-end-0 text-primary">
                             <i class="fas fa-search"></i>
@@ -15,8 +15,9 @@
                         <input type="text" class="form-control border-start-0 bg-transparent ps-0" id="pos-search"
                             placeholder="Buscar producto..." aria-label="Buscar producto">
                     </div>
+
                     <!-- Botón de Alertas de Vencimiento -->
-                    <button class="btn btn-warning shadow-sm position-relative rounded-circle p-0"
+                    <button class="btn btn-warning shadow-sm position-relative rounded-circle p-0 flex-shrink-0"
                         style="width: 48px; height: 48px;" onclick="openExpirationModal()"
                         title="Gestionar Vencimientos">
                         <i class="fas fa-exclamation-triangle text-dark"></i>
@@ -26,21 +27,13 @@
                         </span>
                     </button>
                 </div>
+
                 <!-- Categorías Pills -->
-                <div class="col-12 col-lg-6">
-                    <div class="d-flex gap-2 overflow-auto py-1 justify-content-lg-end" id="category-pills"
-                        style="scrollbar-width: thin;">
-                        <button class="btn btn-primary rounded-pill px-3 fw-bold shadow-sm active flex-shrink-0"
-                            data-cat="">Todo</button>
-                        <button
-                            class="btn btn-outline-secondary rounded-pill px-3 fw-bold border-0 bg-white shadow-sm flex-shrink-0"
-                            data-cat="Bebidas">Bebidas</button>
-                        <button
-                            class="btn btn-outline-secondary rounded-pill px-3 fw-bold border-0 bg-white shadow-sm flex-shrink-0"
-                            data-cat="Abarrotes">Abarrotes</button>
-                        <button
-                            class="btn btn-outline-secondary rounded-pill px-3 fw-bold border-0 bg-white shadow-sm flex-shrink-0"
-                            data-cat="Limpieza">Limpieza</button>
+                <div class="col-12 col-lg-7">
+                    <div class="d-flex gap-2 overflow-auto py-1" id="category-pills"
+                        style="white-space: nowrap; -ms-overflow-style: none; scrollbar-width: none;">
+                        <!-- JS inyectará botones aquí -->
+                        <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
                     </div>
                 </div>
             </div>
@@ -144,8 +137,8 @@
 <div class="modal fade" id="modalCobrar" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title fw-bold"><i class="fas fa-cash-register me-2"></i> Procesar Pago</h5>
+            <div class="modal-header bg-primary">
+                <h5 class="modal-title fw-bold text-white"><i class="fas fa-cash-register me-2"></i> Procesar Pago</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -164,25 +157,20 @@
                 <div class="mb-3">
                     <label class="form-label fw-bold">Método de Pago</label>
                     <div class="row g-2">
-                        <div class="col-4">
-                            <input type="radio" class="btn-check" name="metodoPago" id="pago-efectivo" value="efectivo" checked onchange="togglePagoInput('efectivo')">
+                        <div class="col-6">
+                            <input type="radio" class="btn-check" name="metodoPago" id="pago-efectivo" value="efectivo"
+                                checked onchange="togglePagoInput('efectivo')">
                             <label class="btn btn-outline-success w-100" for="pago-efectivo">
                                 <i class="fas fa-money-bill-wave d-block mb-1"></i>
                                 <small>Efectivo</small>
                             </label>
                         </div>
-                        <div class="col-4">
-                            <input type="radio" class="btn-check" name="metodoPago" id="pago-tarjeta" value="tarjeta" onchange="togglePagoInput('tarjeta')">
+                        <div class="col-6">
+                            <input type="radio" class="btn-check" name="metodoPago" id="pago-tarjeta" value="tarjeta"
+                                onchange="togglePagoInput('tarjeta')">
                             <label class="btn btn-outline-primary w-100" for="pago-tarjeta">
                                 <i class="fas fa-credit-card d-block mb-1"></i>
                                 <small>Tarjeta</small>
-                            </label>
-                        </div>
-                        <div class="col-4">
-                            <input type="radio" class="btn-check" name="metodoPago" id="pago-vales" value="vales" onchange="togglePagoInput('vales')">
-                            <label class="btn btn-outline-warning w-100" for="pago-vales">
-                                <i class="fas fa-ticket-alt d-block mb-1"></i>
-                                <small>Vales</small>
                             </label>
                         </div>
                     </div>
@@ -191,9 +179,9 @@
                 <div id="seccion-efectivo">
                     <div class="mb-3">
                         <label class="form-label fw-bold">Monto Recibido</label>
-                        <input type="number" class="form-control form-control-lg text-center fw-bold" 
-                               id="input-pago-recibido" placeholder="0.00" step="0.01" 
-                               oninput="calcularCambio()">
+                        <input type="number" class="form-control form-control-lg text-center fw-bold"
+                            id="input-pago-recibido" placeholder="0.00" step="0.01" oninput="calcularCambio()"
+                            onfocus="this.value=''">
                     </div>
                     <div class="alert alert-info d-flex justify-content-between align-items-center">
                         <span>Cambio:</span>

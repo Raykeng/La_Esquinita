@@ -73,7 +73,8 @@ async function loadProductosFromAPI() {
                 // Asegurar tipos de datos correctos
                 precio_venta: parseFloat(p.precio_venta),
                 stock_actual: parseInt(p.stock_actual),
-                descuento_manual: 0 // Campo local para la sesión actual
+                descuento_manual: parseFloat(p.descuento_manual) || 0, // Cargar desde BD
+                promocion: (parseFloat(p.descuento_manual) || 0) > 0 // Marcar como promoción si tiene descuento
             }));
 
             // Extraer categorías únicas y válidas (sin nulos)
@@ -247,8 +248,10 @@ function updatePreviewPrice(input, precioBase) {
     }
 }
 
-function guardarDescuentos() {
+async function guardarDescuentos() {
     const inputs = document.querySelectorAll('.manual-discount-input');
+    const descuentos = [];
+
     inputs.forEach(input => {
         const id = parseInt(input.dataset.id);
         const descuento = parseFloat(input.value) || 0;
@@ -257,12 +260,34 @@ function guardarDescuentos() {
         if (producto) {
             producto.descuento_manual = descuento;
             producto.promocion = descuento > 0;
+
+            // Agregar a la lista para enviar al servidor
+            descuentos.push({ id, descuento });
         }
     });
 
-    showToast('Descuentos aplicados localmente', 'success');
-    bootstrap.Modal.getInstance(document.getElementById('modalVencimientos')).hide();
+    try {
+        // Guardar en la base de datos
+        const response = await fetch('api/actualizar_descuentos.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ descuentos })
+        });
 
+        const result = await response.json();
+
+        if (result.success) {
+            showToast('Descuentos guardados permanentemente', 'success');
+        } else {
+            throw new Error(result.message);
+        }
+    } catch (error) {
+        console.error('Error guardando descuentos:', error);
+        showToast('Error al guardar descuentos: ' + error.message, 'danger');
+        return;
+    }
+
+    bootstrap.Modal.getInstance(document.getElementById('modalVencimientos')).hide();
     renderPOSGrid(APP_STATE.productos);
     renderCart();
 }
@@ -337,6 +362,7 @@ function renderCart() {
     const btnPay = document.getElementById('btn-pay');
 
     if (!container || !totalEl || !btnPay) {
+        // [MERGE] Aceptamos el warning del remoto, es útil.
         console.warn('Elementos del carrito no encontrados en el DOM');
         return;
     }
@@ -348,14 +374,17 @@ function renderCart() {
                 <p>Carrito vacío</p>
             </div>`;
         totalEl.innerText = 'Q 0.00';
-        
-        // Verificar si existen antes de actualizar
-        const subtotalEl = document.getElementById('cart-subtotal-display');
-        const discountEl = document.getElementById('cart-discount-display');
-        
-        if (subtotalEl) subtotalEl.innerText = 'Q 0.00';
-        if (discountEl) discountEl.innerText = '- Q 0.00';
-        
+
+        // [MERGE] Mantenemos nuestra lógica robusta que incluye TAX (el remoto no lo tenía)
+        const sub = document.getElementById('cart-subtotal-display');
+        if (sub) sub.innerText = 'Q 0.00';
+
+        const disc = document.getElementById('cart-discount-display');
+        if (disc) disc.innerText = '- Q 0.00';
+
+        const tax = document.getElementById('cart-tax-display');
+        if (tax) tax.innerText = 'Q 0.00';
+
         btnPay.disabled = true;
         return;
     }
@@ -402,10 +431,12 @@ function renderCart() {
     // Verificar si existen antes de actualizar
     const subtotalEl = document.getElementById('cart-subtotal-display');
     const discountEl = document.getElementById('cart-discount-display');
-    
+    const taxEl = document.getElementById('cart-tax-display');
+
     if (subtotalEl) subtotalEl.innerText = `Q ${(total + totalDescuento).toFixed(2)}`;
     if (discountEl) discountEl.innerText = `- Q ${totalDescuento.toFixed(2)}`;
     totalEl.innerText = `Q ${total.toFixed(2)}`;
+    if (taxEl) taxEl.innerText = `Q ${(total * 0.12).toFixed(2)}`;
 }
 
 function updateQty(index, change) {
@@ -488,9 +519,9 @@ function togglePagoInput(metodo) {
 function calcularCambio() {
     const inputEl = document.getElementById('input-pago-recibido');
     const lbl = document.getElementById('lbl-cambio');
-    
+
     if (!inputEl || !lbl) return;
-    
+
     const recibido = parseFloat(inputEl.value) || 0;
     const cambio = recibido - totalVentaActual;
 
