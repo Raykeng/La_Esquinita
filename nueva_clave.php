@@ -8,7 +8,7 @@ $errorMessage = '';
 
 if (!empty($token)) {
     // Verificar token con la API
-    $apiUrl = 'http://localhost/La_Esquinita/api/password-reset.php';
+    $apiUrl = 'http://localhost/La_Esquinita/La_Esquinita/api/password-reset.php';
     $postData = json_encode([
         'action' => 'verify_token',
         'token' => $token
