@@ -181,11 +181,13 @@ function checkExpirations() {
     });
 
     const badge = document.getElementById('expiration-badge');
-    if (expiring.length > 0) {
-        badge.innerText = expiring.length;
-        badge.style.display = 'block';
-    } else {
-        badge.style.display = 'none';
+    if (badge) {
+        if (expiring.length > 0) {
+            badge.innerText = expiring.length;
+            badge.style.display = 'block';
+        } else {
+            badge.style.display = 'none';
+        }
     }
 }
 
@@ -331,6 +333,8 @@ function renderCart() {
     const totalEl = document.getElementById('cart-total');
     const btnPay = document.getElementById('btn-pay');
 
+    if (!container || !totalEl || !btnPay) return;
+
     if (APP_STATE.carrito.length === 0) {
         container.innerHTML = `
             <div class="text-center p-5 text-muted">
@@ -338,9 +342,16 @@ function renderCart() {
                 <p>Carrito vacío</p>
             </div>`;
         totalEl.innerText = 'Q 0.00';
-        document.getElementById('cart-subtotal-display').innerText = 'Q 0.00';
-        document.getElementById('cart-discount-display').innerText = '- Q 0.00';
-        document.getElementById('cart-tax-display').innerText = 'Q 0.00';
+
+        const sub = document.getElementById('cart-subtotal-display');
+        if (sub) sub.innerText = 'Q 0.00';
+
+        const disc = document.getElementById('cart-discount-display');
+        if (disc) disc.innerText = '- Q 0.00';
+
+        const tax = document.getElementById('cart-tax-display');
+        if (tax) tax.innerText = 'Q 0.00';
+
         btnPay.disabled = true;
         return;
     }

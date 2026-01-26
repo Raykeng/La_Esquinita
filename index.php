@@ -5,6 +5,7 @@ $vista = isset($_GET['vista']) ? $_GET['vista'] : 'dashboard';
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,6 +14,7 @@ $vista = isset($_GET['vista']) ? $_GET['vista'] : 'dashboard';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
     <div class="main-wrapper">
@@ -29,6 +31,9 @@ $vista = isset($_GET['vista']) ? $_GET['vista'] : 'dashboard';
                         break;
                     case 'pos':
                         include 'modulos/pos.php';
+                        break;
+                    case 'productos':
+                        include 'modulos/productos.php';
                         break;
                     case 'inventario':
                         include 'modulos/inventario.php';
@@ -51,4 +56,5 @@ $vista = isset($_GET['vista']) ? $_GET['vista'] : 'dashboard';
     <?php include 'layout/footer.php'; ?>
 
 </body>
+
 </html>

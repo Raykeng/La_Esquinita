@@ -40,5 +40,43 @@ class Producto
             return [];
         }
     }
+
+    /**
+     * Crear un nuevo producto
+     */
+    public function crear($datos)
+    {
+        try {
+            $sql = "INSERT INTO productos (
+                        codigo_barras, nombre, categoria_id, proveedor_id, 
+                        precio_compra, precio_venta, stock_actual, stock_minimo, 
+                        unidad_medida, fecha_vencimiento
+                    ) VALUES (
+                        :codigo, :nombre, :categoria, :proveedor,
+                        :costo, :precio, :stock, :minimo,
+                        :unidad, :vencimiento
+                    )";
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                ':codigo' => $datos['codigo_barras'],
+                ':nombre' => $datos['nombre'],
+                ':categoria' => $datos['categoria_id'],
+                ':proveedor' => !empty($datos['proveedor_id']) ? $datos['proveedor_id'] : null,
+                ':costo' => !empty($datos['precio_compra']) ? $datos['precio_compra'] : 0,
+                ':precio' => $datos['precio_venta'],
+                ':stock' => !empty($datos['stock_actual']) ? $datos['stock_actual'] : 0,
+                ':minimo' => !empty($datos['stock_minimo']) ? $datos['stock_minimo'] : 5,
+                ':unidad' => $datos['unidad_medida'],
+                ':vencimiento' => !empty($datos['fecha_vencimiento']) ? $datos['fecha_vencimiento'] : null
+            ]);
+
+            return $this->pdo->lastInsertId();
+
+        } catch (PDOException $e) {
+            error_log("Error en Producto::crear: " . $e->getMessage());
+            throw $e; // Re-lanzar para que el controller lo maneje
+        }
+    }
 }
 ?>

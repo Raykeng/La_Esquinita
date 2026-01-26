@@ -10,11 +10,15 @@
         <a href="index.php?vista=dashboard" class="menu-item <?php echo ($vista == 'dashboard') ? 'active' : ''; ?>">
             <i class="fas fa-home"></i> Inicio
         </a>
-        
+
         <a href="index.php?vista=pos" class="menu-item <?php echo ($vista == 'pos') ? 'active' : ''; ?>">
             <i class="fas fa-cash-register"></i> Punto de Venta
         </a>
-        
+
+        <a href="index.php?vista=productos" class="menu-item <?php echo ($vista == 'productos') ? 'active' : ''; ?>">
+            <i class="fas fa-tags"></i> Productos
+        </a>
+
         <a href="index.php?vista=inventario" class="menu-item <?php echo ($vista == 'inventario') ? 'active' : ''; ?>">
             <i class="fas fa-boxes"></i> Inventario
         </a>
