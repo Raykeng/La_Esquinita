@@ -1,7 +1,19 @@
 <?php
 // index.php
+// Incluir middleware de autenticación
+require_once 'middleware/auth.php';
+
+// Verificar autenticación
+verificarAutenticacion();
+
 // Capturamos la 'llave' de la URL. Si no hay llave, vamos a 'dashboard'.
 $vista = isset($_GET['vista']) ? $_GET['vista'] : 'dashboard';
+
+// Verificar acceso a la vista según el rol
+verificarAccesoVista($vista);
+
+// Obtener información del usuario actual
+$usuarioActual = obtenerUsuarioActual();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -78,8 +90,17 @@ $vista = isset($_GET['vista']) ? $_GET['vista'] : 'dashboard';
                     case 'clientes':
                         include 'modulos/clientes.php';
                         break;
+                    case 'proveedores':
+                        include 'modulos/proveedores.php';
+                        break;
                     case 'caja':
                         include 'modulos/caja.php';
+                        break;
+                    case 'usuarios':
+                        include 'modulos/usuarios.php';
+                        break;
+                    case 'reportes':
+                        include 'modulos/reportes.php';
                         break;
                     default:
                         echo "<h2>Error 404: Página no encontrada</h2>";

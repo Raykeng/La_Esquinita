@@ -60,7 +60,12 @@
                 </div>
                 <div class="card-body">
                     <div id="lista-ingresos">
-                        <!-- Se llena dinámicamente -->
+                        <div class="text-center text-muted py-3">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                            <p class="mt-2 mb-0">Cargando ingresos...</p>
+                        </div>
                     </div>
                     <div class="border-top pt-3 mt-3">
                         <strong>Total Ingresos: <span id="total-ingresos">Q 0.00</span></strong>
@@ -79,7 +84,12 @@
                 </div>
                 <div class="card-body">
                     <div id="lista-egresos">
-                        <!-- Se llena dinámicamente -->
+                        <div class="text-center text-muted py-3">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                            <p class="mt-2 mb-0">Cargando egresos...</p>
+                        </div>
                     </div>
                     <div class="border-top pt-3 mt-3">
                         <strong>Total Egresos: <span id="total-egresos">Q 0.00</span></strong>
@@ -110,7 +120,14 @@
                                 </tr>
                             </thead>
                             <tbody id="tabla-cierres">
-                                <!-- Se llena dinámicamente -->
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted py-4">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Cargando...</span>
+                                        </div>
+                                        <p class="mt-2 mb-0">Cargando historial...</p>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>

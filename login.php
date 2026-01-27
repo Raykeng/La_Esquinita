@@ -1,5 +1,15 @@
+<?php
+session_start();
+
+// Si ya está logueado, redirigir al dashboard
+if (isset($_SESSION['usuario_id'])) {
+    header('Location: index.php');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +19,83 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #0dcaf0;
+            --dark-color: #212529;
+            --light-color: #f8f9fa;
+            --body-bg: #f5f7fb;
+            --card-bg: #ffffff;
+            --border-color: #e9ecef;
+        }
+
+        body {
+            background-color: var(--body-bg);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            color: var(--dark-color);
+            overflow-x: hidden;
+        }
+
+        .auth-body {
+            background: linear-gradient(135deg, var(--primary-color), #0a58ca);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .auth-header {
+            background: var(--light-color);
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .auth-logo {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .auth-content {
+            padding: 30px;
+        }
+
+        .auth-footer {
+            text-align: center;
+            padding: 20px;
+            background: var(--light-color);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .text-xs {
+            font-size: 0.75rem;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 
 <body class="auth-body">
@@ -24,43 +110,36 @@
         </div>
 
         <div class="auth-content">
-            <!-- Alertas -->
-            <div id="alert-container"></div>
-
-            <form id="login-form" action="index.php?vista=dashboard" method="POST">
+            <form id="loginForm">
                 <div class="mb-3">
                     <label class="form-label">Correo Electrónico</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                        <input type="email" id="email" name="email" class="form-control" 
-                               placeholder="cajero@laesquinita.com" required>
+                        <input type="text" class="form-control" id="username" placeholder="admin@laesquinita.com"
+                            value="admin@laesquinita.com" required>
                     </div>
-                    <div class="invalid-feedback" id="email-error"></div>
                 </div>
 
                 <div class="mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-1">
                         <label class="form-label mb-0">Contraseña</label>
-                        <a href="recuperar.php" class="text-xs text-decoration-none">¿Olvidaste tu contraseña?</a>
+                        <a href="forgot-password.html" class="text-xs text-decoration-none">¿Olvidaste tu
+                            contraseña?</a>
                     </div>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                        <input type="password" id="password" name="password" class="form-control" 
-                               placeholder="••••••••" required minlength="6">
-                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()">
-                            <i class="fas fa-eye" id="password-eye"></i>
-                        </button>
+                        <input type="password" class="form-control" id="password" placeholder="••••••••" value="password" required>
                     </div>
-                    <div class="invalid-feedback" id="password-error"></div>
-                    <div class="form-text">Mínimo 6 caracteres</div>
                 </div>
 
                 <div class="d-grid">
-                    <button type="submit" id="login-btn" class="btn btn-primary btn-lg fw-bold">
-                        INGRESAR <i class="fas fa-arrow-right ms-2"></i>
+                    <button type="submit" class="btn btn-primary btn-lg fw-bold" id="btnLogin">
+                        <span id="btnText">INGRESAR</span> <i class="fas fa-arrow-right ms-2"></i>
                     </button>
                 </div>
             </form>
+            
+            <div id="alertContainer" class="mt-3"></div>
         </div>
 
         <div class="auth-footer">
@@ -70,141 +149,94 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    
     <script>
-        // Validación del formulario de login
-        document.getElementById('login-form').addEventListener('submit', function(event) {
-            event.preventDefault();
+        // Manejar envío del formulario
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
             
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const loginBtn = document.getElementById('login-btn');
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const btnLogin = document.getElementById('btnLogin');
+            const btnText = document.getElementById('btnText');
             
-            // Limpiar errores previos
-            clearErrors();
-            
-            let isValid = true;
-            
-            // Validar email
-            if (!email) {
-                showFieldError('email', 'El correo electrónico es requerido');
-                isValid = false;
-            } else if (!isValidEmail(email)) {
-                showFieldError('email', 'Ingresa un correo electrónico válido');
-                isValid = false;
-            }
-            
-            // Validar contraseña
-            if (!password) {
-                showFieldError('password', 'La contraseña es requerida');
-                isValid = false;
-            } else if (password.length < 6) {
-                showFieldError('password', 'La contraseña debe tener al menos 6 caracteres');
-                isValid = false;
-            }
-            
-            if (!isValid) {
+            if (!username || !password) {
+                mostrarAlerta('Por favor completa todos los campos', 'warning');
                 return;
             }
             
             // Mostrar loading
-            loginBtn.disabled = true;
-            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Ingresando...';
+            btnLogin.disabled = true;
+            btnText.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Iniciando...';
             
-            // Simular validación (aquí iría la lógica real de autenticación)
-            setTimeout(() => {
-                // Por ahora, solo validamos formato y enviamos el formulario
-                this.submit();
-            }, 1000);
-        });
-        
-        // Función para mostrar errores en campos
-        function showFieldError(fieldId, message) {
-            const field = document.getElementById(fieldId);
-            const errorDiv = document.getElementById(fieldId + '-error');
-            
-            field.classList.add('is-invalid');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-        }
-        
-        // Función para limpiar errores
-        function clearErrors() {
-            const fields = ['email', 'password'];
-            fields.forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                const errorDiv = document.getElementById(fieldId + '-error');
+            try {
+                const response = await fetch('api/auth.php?action=login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
                 
-                field.classList.remove('is-invalid', 'is-valid');
-                errorDiv.textContent = '';
-                errorDiv.style.display = 'none';
-            });
-        }
-        
-        // Validar email en tiempo real
-        document.getElementById('email').addEventListener('blur', function() {
-            const email = this.value.trim();
-            
-            if (email && isValidEmail(email)) {
-                this.classList.remove('is-invalid');
-                this.classList.add('is-valid');
-                document.getElementById('email-error').style.display = 'none';
+                const data = await response.json();
+                
+                if (data.success) {
+                    mostrarAlerta('¡Login exitoso! Redirigiendo...', 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'index.php';
+                    }, 1000);
+                } else {
+                    mostrarAlerta(data.message || 'Credenciales incorrectas', 'danger');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarAlerta('Error de conexión. Intenta nuevamente.', 'danger');
+            } finally {
+                // Restaurar botón
+                btnLogin.disabled = false;
+                btnText.innerHTML = 'INGRESAR';
             }
         });
         
-        // Validar contraseña en tiempo real
-        document.getElementById('password').addEventListener('input', function() {
-            const password = this.value;
+        // Mostrar alertas
+        function mostrarAlerta(mensaje, tipo) {
+            const container = document.getElementById('alertContainer');
+            const alertClass = tipo === 'success' ? 'alert-success' : 
+                              tipo === 'warning' ? 'alert-warning' : 'alert-danger';
             
-            if (password.length >= 6) {
-                this.classList.remove('is-invalid');
-                this.classList.add('is-valid');
-                document.getElementById('password-error').style.display = 'none';
-            }
-        });
-        
-        // Función para validar formato de email
-        function isValidEmail(email) {
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return emailRegex.test(email);
-        }
-        
-        // Función para mostrar/ocultar contraseña
-        function togglePassword() {
-            const passwordField = document.getElementById('password');
-            const eyeIcon = document.getElementById('password-eye');
-            
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                eyeIcon.classList.remove('fa-eye');
-                eyeIcon.classList.add('fa-eye-slash');
-            } else {
-                passwordField.type = 'password';
-                eyeIcon.classList.remove('fa-eye-slash');
-                eyeIcon.classList.add('fa-eye');
-            }
-        }
-        
-        // Mostrar alerta
-        function showAlert(message, type) {
-            const alertContainer = document.getElementById('alert-container');
-            const alertClass = type === 'danger' ? 'alert-danger' : 
-                              type === 'success' ? 'alert-success' : 
-                              type === 'info' ? 'alert-info' : 'alert-warning';
-            
-            const icon = type === 'danger' ? 'fa-exclamation-triangle' : 
-                        type === 'success' ? 'fa-check-circle' : 
-                        type === 'info' ? 'fa-info-circle' : 'fa-exclamation-circle';
-            
-            alertContainer.innerHTML = `
+            container.innerHTML = `
                 <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
-                    <i class="fas ${icon} me-2"></i>${message}
+                    ${mensaje}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             `;
+            
+            // Auto-ocultar después de 4 segundos
+            setTimeout(() => {
+                const alert = container.querySelector('.alert');
+                if (alert) {
+                    alert.remove();
+                }
+            }, 4000);
         }
+        
+        // Focus automático en el campo usuario
+        document.getElementById('username').focus();
+        
+        // Enter en username pasa a password
+        document.getElementById('username').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('password').focus();
+            }
+        });
+        
+        // Datos de prueba para desarrollo
+        console.log('Usuarios de prueba:');
+        console.log('Admin: admin@laesquinita.com / password');
+        console.log('Usuario: mj3u7000@hotmail.com / password');
     </script>
 </body>
+
 </html>

@@ -1,7 +1,11 @@
 <?php
-// logout.php
 session_start();
-session_destroy();
-header("Location: login.php");
+require_once 'middleware/auth.php';
+
+// Limpiar sesión completamente
+limpiarSesion();
+
+// Redirigir al login
+header('Location: login.php?logout=1');
 exit;
 ?>
