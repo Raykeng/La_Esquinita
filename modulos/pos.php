@@ -5,35 +5,40 @@
     <div class="col-12 col-md-7 col-lg-8 d-flex flex-column h-100 bg-light border-end">
 
         <!-- BARRA SUPERIOR: Búsqueda y Filtros -->
-        <div class="p-2 bg-white border-bottom shadow-sm">
-            <div class="row g-2 align-items-center">
-                <div class="col-12 col-lg-4 d-flex align-items-center gap-2">
-                    <div class="input-group search-bar-premium flex-grow-1">
+        <div class="p-3 bg-white border-bottom shadow-sm pos-header">
+            <!-- Primera fila: Barra de búsqueda más grande con icono de alertas -->
+            <div class="row g-3 mb-3">
+                <div class="col-12 col-lg-10">
+                    <div class="input-group search-bar-premium">
                         <span class="input-group-text bg-transparent border-end-0 text-primary">
                             <i class="fas fa-search"></i>
                         </span>
-                        <input type="text" class="form-control border-start-0 bg-transparent ps-0" id="pos-search"
-                            placeholder="Buscar producto..." aria-label="Buscar producto">
+                        <input type="text" class="form-control border-start-0 bg-transparent ps-0 form-control-lg" id="pos-search"
+                            placeholder="Buscar producto por nombre, código de barras..." aria-label="Buscar producto">
                     </div>
-
+                </div>
+                <div class="col-12 col-lg-2 d-flex justify-content-end">
                     <!-- Botón de Alertas de Vencimiento -->
-                    <button class="btn btn-warning shadow-sm position-relative rounded-circle p-0 flex-shrink-0"
-                        style="width: 36px; height: 36px;" onclick="openExpirationModal()"
-                        title="Gestionar Vencimientos">
-                        <i class="fas fa-exclamation-triangle text-dark"></i>
+                    <button class="btn btn-warning shadow-sm position-relative rounded-pill px-3 py-2"
+                        onclick="openExpirationModal()" title="Gestionar Vencimientos">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <span class="fw-bold">Alertas</span>
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
                             id="expiration-badge" style="display:none">
                             0
                         </span>
                     </button>
                 </div>
+            </div>
 
-                <!-- Categorías Pills -->
-                <div class="col-12 col-lg-8">
-                    <div class="d-flex gap-1 overflow-auto py-1" id="category-pills"
-                        style="white-space: nowrap; -ms-overflow-style: none; scrollbar-width: none;">
+            <!-- Segunda fila: Filtros de categorías -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex gap-2 flex-wrap" id="category-pills">
                         <!-- JS inyectará botones aquí -->
-                        <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                        </div>
                     </div>
                 </div>
             </div>

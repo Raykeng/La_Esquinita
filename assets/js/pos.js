@@ -114,15 +114,16 @@ function mostrarCategorias(categorias) {
     if (!container) return;
     
     let html = `
-        <button class="btn btn-primary btn-sm active" data-cat="">
-            <i class="fas fa-th-large me-1"></i> Todos
+        <span class="text-muted small fw-bold me-3">Filtrar por:</span>
+        <button class="btn btn-primary rounded-pill px-3 py-2 active" data-cat="">
+            <i class="fas fa-th-large me-2"></i>Todos
         </button>
     `;
     
     categorias.forEach(categoria => {
         html += `
-            <button class="btn btn-outline-secondary btn-sm" data-cat="${categoria.nombre}">
-                <i class="fas fa-tag me-1"></i> ${categoria.nombre}
+            <button class="btn btn-outline-primary rounded-pill px-3 py-2" data-cat="${categoria.nombre}">
+                <i class="fas fa-tag me-2"></i>${categoria.nombre}
             </button>
         `;
     });
@@ -140,15 +141,16 @@ function mostrarCategoriasEjemplo() {
     const categoriasEjemplo = ['Bebidas', 'Abarrotes', 'Frescos', 'Lácteos', 'Limpieza'];
     
     let html = `
-        <button class="btn btn-primary btn-sm active" data-cat="">
-            <i class="fas fa-th-large me-1"></i> Todos
+        <span class="text-muted small fw-bold me-3">Filtrar por:</span>
+        <button class="btn btn-primary rounded-pill px-3 py-2 active" data-cat="">
+            <i class="fas fa-th-large me-2"></i>Todos
         </button>
     `;
     
     categoriasEjemplo.forEach(categoria => {
         html += `
-            <button class="btn btn-outline-secondary btn-sm" data-cat="${categoria}">
-                <i class="fas fa-tag me-1"></i> ${categoria}
+            <button class="btn btn-outline-primary rounded-pill px-3 py-2" data-cat="${categoria}">
+                <i class="fas fa-tag me-2"></i>${categoria}
             </button>
         `;
     });

@@ -428,3 +428,95 @@ body {
     font-size: 0.9rem;
     border-top: 1px solid var(--border-color);
 }
+
+/* === POS STYLES === */
+.search-bar-premium {
+    border-radius: 12px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+}
+
+.search-bar-premium:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+    background: white;
+}
+
+.search-bar-premium .form-control {
+    border: none;
+    background: transparent;
+    font-size: 1.1rem;
+    padding: 12px 15px;
+}
+
+.search-bar-premium .form-control:focus {
+    box-shadow: none;
+    background: transparent;
+}
+
+.search-bar-premium .input-group-text {
+    border: none;
+    background: transparent;
+    padding: 12px 15px;
+}
+
+/* Botones de categorías mejorados */
+#category-pills {
+    gap: 8px !important;
+}
+
+#category-pills .btn {
+    border-width: 2px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+#category-pills .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+#category-pills .btn.active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
+
+/* Botón de alertas mejorado */
+.btn-warning.rounded-pill {
+    border-width: 2px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-warning.rounded-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 193, 7, 0.4);
+}
+
+/* Espaciado mejorado para el header del POS */
+.pos-header {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-bottom: 3px solid #e9ecef;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    #category-pills {
+        flex-wrap: wrap !important;
+    }
+    
+    #category-pills .btn {
+        margin-bottom: 4px;
+    }
+    
+    .search-bar-premium .form-control {
+        font-size: 16px; /* Evita zoom en iOS */
+    }
+}
+
+/* Animaciones suaves */
+.btn, .form-control, .input-group {
+    transition: all 0.2s ease;
+}
