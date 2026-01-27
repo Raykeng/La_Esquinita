@@ -37,13 +37,13 @@ if (isset($_SESSION['usuario_id'])) {
             <i class="fas fa-users"></i> Clientes
         </a>
 
+        <a href="index.php?vista=caja" class="menu-item <?php echo ($vista == 'caja') ? 'active' : ''; ?>">
+            <i class="fas fa-wallet"></i> Cierre de Caja
+        </a>
+
         <?php if ($usuarioActual && $usuarioActual['rol'] === 'administrador'): ?>
         <a href="index.php?vista=proveedores" class="menu-item <?php echo ($vista == 'proveedores') ? 'active' : ''; ?>">
             <i class="fas fa-truck"></i> Proveedores
-        </a>
-        
-        <a href="index.php?vista=caja" class="menu-item <?php echo ($vista == 'caja') ? 'active' : ''; ?>">
-            <i class="fas fa-wallet"></i> Cierre de Caja
         </a>
         
         <a href="index.php?vista=reportes" class="menu-item <?php echo ($vista == 'reportes') ? 'active' : ''; ?>">

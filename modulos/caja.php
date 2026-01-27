@@ -6,9 +6,14 @@
 <div class="dashboard-main-body">
     <div class="d-flex align-items-center flex-wrap gap-2 justify-content-between mb-4">
         <h4 class="mb-0 fw-bold">Cierre de Caja</h4>
-        <button class="btn btn-success" onclick="procesarCierreCaja()">
-            <i class="fas fa-calculator me-2"></i>Procesar Cierre
-        </button>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-info" onclick="generarReporte()">
+                <i class="fas fa-chart-bar me-2"></i>Generar Reporte
+            </button>
+            <button class="btn btn-success" onclick="procesarCierreCaja()">
+                <i class="fas fa-calculator me-2"></i>Procesar Cierre
+            </button>
+        </div>
     </div>
 
     <div class="row gy-4">
@@ -137,17 +142,4 @@
     </div>
 </div>
 
-<script>
-// Funciones para cierre de caja - se implementarán después
-function procesarCierreCaja() {
-    console.log('Procesar cierre de caja');
-}
-
-function agregarIngreso() {
-    console.log('Agregar ingreso');
-}
-
-function agregarEgreso() {
-    console.log('Agregar egreso');
-}
-</script>
+<script src="assets/js/caja.js"></script>
