@@ -60,20 +60,36 @@ function obtenerTurnoActual() {
         $resumenVentas = $stmt->fetch(PDO::FETCH_ASSOC);
         
         // Obtener ingresos adicionales del día
-        $sqlIngresos = "SELECT * FROM movimientos_caja 
-                        WHERE tipo = 'ingreso' AND DATE(fecha) = ? 
-                        ORDER BY fecha DESC";
-        $stmt = $pdo->prepare($sqlIngresos);
-        $stmt->execute([$fechaHoy]);
-        $ingresos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $ingresos = [];
+        $egresos = [];
         
-        // Obtener egresos del día
-        $sqlEgresos = "SELECT * FROM movimientos_caja 
-                       WHERE tipo = 'egreso' AND DATE(fecha) = ? 
-                       ORDER BY fecha DESC";
-        $stmt = $pdo->prepare($sqlEgresos);
-        $stmt->execute([$fechaHoy]);
-        $egresos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            // Verificar que la tabla movimientos_caja existe
+            $checkTable = "SHOW TABLES LIKE 'movimientos_caja'";
+            $tableExists = $pdo->query($checkTable)->rowCount() > 0;
+            
+            if ($tableExists) {
+                $sqlIngresos = "SELECT * FROM movimientos_caja 
+                                WHERE tipo = 'ingreso' AND DATE(fecha) = ? 
+                                ORDER BY fecha DESC";
+                $stmt = $pdo->prepare($sqlIngresos);
+                $stmt->execute([$fechaHoy]);
+                $ingresos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                
+                // Obtener egresos del día
+                $sqlEgresos = "SELECT * FROM movimientos_caja 
+                               WHERE tipo = 'egreso' AND DATE(fecha) = ? 
+                               ORDER BY fecha DESC";
+                $stmt = $pdo->prepare($sqlEgresos);
+                $stmt->execute([$fechaHoy]);
+                $egresos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            }
+        } catch (Exception $e) {
+            // Si hay error con movimientos_caja, continuar con arrays vacíos
+            error_log("Error al obtener movimientos: " . $e->getMessage());
+            $ingresos = [];
+            $egresos = [];
+        }
         
         // Obtener ventas detalladas del día
         $sqlVentasDetalle = "SELECT v.*, u.nombre_completo as cajero, c.nombre as cliente_nombre
@@ -253,6 +269,9 @@ function generarReporteCierre() {
     $fechaFin = $_GET['fecha_fin'] ?? date('Y-m-d');
     
     try {
+        // Verificar y crear tablas si es necesario
+        verificarTablasCaja();
+        
         // Obtener cierres en el rango de fechas
         $sql = "SELECT * FROM cierres_caja 
                 WHERE fecha_cierre BETWEEN ? AND ? 
@@ -271,14 +290,27 @@ function generarReporteCierre() {
         $totalEgresos = array_sum(array_column($cierres, 'egresos'));
         $totalFinal = array_sum(array_column($cierres, 'total_final'));
         
-        // Obtener movimientos en el rango
-        $sqlMovimientos = "SELECT * FROM movimientos_caja 
-                          WHERE DATE(fecha) BETWEEN ? AND ? 
-                          ORDER BY fecha DESC";
-        
-        $stmt = $pdo->prepare($sqlMovimientos);
-        $stmt->execute([$fechaInicio, $fechaFin]);
-        $movimientos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // Obtener movimientos en el rango - con manejo de errores mejorado
+        $movimientos = [];
+        try {
+            // Verificar que la tabla existe y tiene la columna fecha
+            $sqlCheckColumn = "SHOW COLUMNS FROM movimientos_caja LIKE 'fecha'";
+            $columnExists = $pdo->query($sqlCheckColumn)->rowCount() > 0;
+            
+            if ($columnExists) {
+                $sqlMovimientos = "SELECT * FROM movimientos_caja 
+                                  WHERE DATE(fecha) BETWEEN ? AND ? 
+                                  ORDER BY fecha DESC";
+                
+                $stmt = $pdo->prepare($sqlMovimientos);
+                $stmt->execute([$fechaInicio, $fechaFin]);
+                $movimientos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            }
+        } catch (Exception $e) {
+            // Si hay error con movimientos, continuar sin ellos
+            error_log("Error en consulta movimientos_caja: " . $e->getMessage());
+            $movimientos = [];
+        }
         
         echo json_encode([
             'success' => true,
