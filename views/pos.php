@@ -13,8 +13,9 @@
                         <span class="input-group-text bg-transparent border-end-0 text-primary">
                             <i class="fas fa-search"></i>
                         </span>
-                        <input type="text" class="form-control border-start-0 bg-transparent ps-0 form-control-lg" id="pos-search"
-                            placeholder="Buscar producto por nombre, código de barras..." aria-label="Buscar producto">
+                        <input type="text" class="form-control border-start-0 bg-transparent ps-0 form-control-lg"
+                            id="pos-search" placeholder="Buscar producto por nombre, código de barras..."
+                            aria-label="Buscar producto">
                     </div>
                 </div>
                 <div class="col-12 col-lg-2 d-flex justify-content-end">

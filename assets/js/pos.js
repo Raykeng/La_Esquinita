@@ -14,19 +14,19 @@ let descuentoTotal = 0;
 function getApiBaseUrl() {
     const pathname = window.location.pathname;
     const dirs = pathname.split('/').filter(Boolean);
-    
+
     // Si termina en index.php, lo quitamos
     if (dirs[dirs.length - 1] === 'index.php') {
         dirs.pop();
     }
-    
+
     const baseUrl = '/' + dirs.join('/') + '/';
     console.log('🔧 API Base URL calculada:', baseUrl);
     return baseUrl;
 }
 
 // Inicializar POS cuando se carga la página
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     if (document.getElementById('pos-grid')) {
         inicializarPOS();
     }
@@ -49,23 +49,23 @@ function inicializarPOS() {
  */
 async function cargarProductos() {
     console.log('🔄 Iniciando carga de productos...');
-    
+
     try {
         // Calcula la URL base dinámicamente
         const apiBaseUrl = getApiBaseUrl();
         const url = window.location.origin + apiBaseUrl + 'api/productos.php';
         console.log('📡 Fetching from:', url);
-        
+
         const response = await fetch(url);
         console.log('📡 Respuesta de la API:', response);
-        
+
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const data = await response.json();
         console.log('📦 Datos recibidos:', data);
-        
+
         if (data.success) {
             productos = data.data;
             console.log('✅ Productos cargados:', productos.length, 'productos');
@@ -90,10 +90,10 @@ async function cargarCategorias() {
         const apiBaseUrl = getApiBaseUrl();
         const url = window.location.origin + apiBaseUrl + 'api/categorias.php';
         console.log('📂 Cargando categorías desde:', url);
-        
+
         const response = await fetch(url);
         const data = await response.json();
-        
+
         if (data.success) {
             mostrarCategorias(data.data);
         } else {
@@ -112,14 +112,14 @@ async function cargarCategorias() {
 function mostrarCategorias(categorias) {
     const container = document.getElementById('category-pills');
     if (!container) return;
-    
+
     let html = `
         <span class="text-muted small fw-bold me-3">Filtrar por:</span>
         <button class="btn btn-primary rounded-pill px-3 py-2 active" data-cat="">
             <i class="fas fa-th-large me-2"></i>Todos
         </button>
     `;
-    
+
     categorias.forEach(categoria => {
         html += `
             <button class="btn btn-outline-primary rounded-pill px-3 py-2" data-cat="${categoria.nombre}">
@@ -127,7 +127,7 @@ function mostrarCategorias(categorias) {
             </button>
         `;
     });
-    
+
     container.innerHTML = html;
 }
 
@@ -137,16 +137,16 @@ function mostrarCategorias(categorias) {
 function mostrarCategoriasEjemplo() {
     const container = document.getElementById('category-pills');
     if (!container) return;
-    
+
     const categoriasEjemplo = ['Bebidas', 'Abarrotes', 'Frescos', 'Lácteos', 'Limpieza'];
-    
+
     let html = `
         <span class="text-muted small fw-bold me-3">Filtrar por:</span>
         <button class="btn btn-primary rounded-pill px-3 py-2 active" data-cat="">
             <i class="fas fa-th-large me-2"></i>Todos
         </button>
     `;
-    
+
     categoriasEjemplo.forEach(categoria => {
         html += `
             <button class="btn btn-outline-primary rounded-pill px-3 py-2" data-cat="${categoria}">
@@ -154,25 +154,25 @@ function mostrarCategoriasEjemplo() {
             </button>
         `;
     });
-    
+
     container.innerHTML = html;
 }
 function mostrarProductos(productosArray) {
     console.log('🎨 Mostrando productos en el grid:', productosArray.length, 'productos');
     const grid = document.getElementById('pos-grid');
-    
+
     if (!grid) {
         console.error('❌ No se encontró el elemento pos-grid');
         return;
     }
-    
+
     grid.innerHTML = '';
 
     productosArray.forEach((producto, index) => {
         console.log(`📦 Procesando producto ${index + 1}:`, producto.nombre);
         const precioConDescuento = calcularPrecioConDescuento(producto);
         const tieneDescuento = precioConDescuento < producto.precio_venta;
-        
+
         const card = document.createElement('div');
         card.className = 'col';
         card.innerHTML = `
@@ -215,7 +215,7 @@ function mostrarProductos(productosArray) {
         `;
         grid.appendChild(card);
     });
-    
+
     console.log('✅ Grid actualizado con', productosArray.length, 'productos');
 }
 
@@ -230,9 +230,9 @@ function calcularPrecioConDescuento(producto) {
     const hoy = new Date();
     const fechaVencimiento = new Date(producto.fecha_vencimiento);
     const diasRestantes = Math.ceil((fechaVencimiento - hoy) / (1000 * 60 * 60 * 24));
-    
+
     let porcentajeDescuento = 0;
-    
+
     if (diasRestantes <= 6) {
         porcentajeDescuento = 50;
     } else if (diasRestantes <= 14) {
@@ -242,7 +242,7 @@ function calcularPrecioConDescuento(producto) {
     } else if (diasRestantes <= 60) {
         porcentajeDescuento = 10;
     }
-    
+
     const precioOriginal = parseFloat(producto.precio_venta);
     return precioOriginal * (1 - porcentajeDescuento / 100);
 }
@@ -253,9 +253,9 @@ function calcularPrecioConDescuento(producto) {
 function configurarBusqueda() {
     const searchInput = document.getElementById('pos-search');
     if (searchInput) {
-        searchInput.addEventListener('input', function() {
+        searchInput.addEventListener('input', function () {
             const termino = this.value.toLowerCase();
-            const productosFiltrados = productos.filter(producto => 
+            const productosFiltrados = productos.filter(producto =>
                 producto.nombre.toLowerCase().includes(termino) ||
                 producto.codigo_barras.includes(termino)
             );
@@ -269,20 +269,20 @@ function configurarBusqueda() {
  */
 function configurarFiltrosCategorias() {
     // Usar delegación de eventos para botones dinámicos
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         if (e.target.matches('#category-pills button[data-cat]')) {
             const categoryPills = document.querySelectorAll('#category-pills button');
-            
+
             // Remover active de todos
             categoryPills.forEach(p => {
                 p.classList.remove('active', 'btn-primary');
                 p.classList.add('btn-outline-secondary');
             });
-            
+
             // Activar el seleccionado
             e.target.classList.add('active', 'btn-primary');
             e.target.classList.remove('btn-outline-secondary');
-            
+
             const categoria = e.target.getAttribute('data-cat');
             filtrarPorCategoria(categoria);
         }
@@ -297,8 +297,8 @@ function filtrarPorCategoria(categoria) {
         mostrarProductos(productos);
         return;
     }
-    
-    const productosFiltrados = productos.filter(producto => 
+
+    const productosFiltrados = productos.filter(producto =>
         producto.categoria_nombre === categoria
     );
     mostrarProductos(productosFiltrados);
@@ -309,7 +309,7 @@ function filtrarPorCategoria(categoria) {
  */
 function quitarDelCarrito(productoId) {
     const itemExistente = carrito.find(item => item.id === productoId);
-    
+
     if (itemExistente) {
         if (itemExistente.cantidad > 1) {
             itemExistente.cantidad--;
@@ -338,7 +338,7 @@ function actualizarCantidadEnTarjeta(productoId) {
 function agregarAlCarrito(productoId) {
     const producto = productos.find(p => p.id === productoId);
     if (!producto) return;
-    
+
     if (producto.stock_actual <= 0) {
         Swal.fire({
             icon: 'warning',
@@ -347,9 +347,9 @@ function agregarAlCarrito(productoId) {
         });
         return;
     }
-    
+
     const itemExistente = carrito.find(item => item.id === productoId);
-    
+
     if (itemExistente) {
         if (itemExistente.cantidad < producto.stock_actual) {
             itemExistente.cantidad++;
@@ -373,7 +373,7 @@ function agregarAlCarrito(productoId) {
             tiene_descuento: precioConDescuento < parseFloat(producto.precio_venta)
         });
     }
-    
+
     actualizarCarrito();
     actualizarCantidadEnTarjeta(productoId);
 }
@@ -384,7 +384,7 @@ function agregarAlCarrito(productoId) {
 function actualizarCarrito() {
     const container = document.getElementById('cart-items-container');
     const btnPay = document.getElementById('btn-pay');
-    
+
     if (carrito.length === 0) {
         container.innerHTML = `
             <div class="text-center py-5 text-muted">
@@ -398,14 +398,14 @@ function actualizarCarrito() {
         let html = '';
         totalCarrito = 0;
         descuentoTotal = 0;
-        
+
         carrito.forEach((item, index) => {
             const subtotal = item.precio_actual * item.cantidad;
             const descuentoItem = (item.precio_original - item.precio_actual) * item.cantidad;
-            
+
             totalCarrito += subtotal;
             descuentoTotal += descuentoItem;
-            
+
             html += `
                 <div class="cart-item bg-light p-3 rounded mb-2">
                     <div class="d-flex justify-content-between align-items-start mb-2">
@@ -437,16 +437,16 @@ function actualizarCarrito() {
                 </div>
             `;
         });
-        
+
         container.innerHTML = html;
         btnPay.disabled = false;
     }
-    
+
     // Actualizar totales
     document.getElementById('cart-subtotal-display').textContent = `Q ${(totalCarrito + descuentoTotal).toFixed(2)}`;
     document.getElementById('cart-discount-display').textContent = `- Q ${descuentoTotal.toFixed(2)}`;
     document.getElementById('cart-total').textContent = `Q ${totalCarrito.toFixed(2)}`;
-    
+
     // Actualizar cantidades en las tarjetas
     productos.forEach(producto => {
         actualizarCantidadEnTarjeta(producto.id);
@@ -459,12 +459,12 @@ function actualizarCarrito() {
 function cambiarCantidad(index, cambio) {
     const item = carrito[index];
     const nuevaCantidad = item.cantidad + cambio;
-    
+
     if (nuevaCantidad <= 0) {
         eliminarDelCarrito(index);
         return;
     }
-    
+
     if (nuevaCantidad > item.stock_disponible) {
         Swal.fire({
             icon: 'warning',
@@ -473,7 +473,7 @@ function cambiarCantidad(index, cambio) {
         });
         return;
     }
-    
+
     item.cantidad = nuevaCantidad;
     actualizarCarrito();
 }
@@ -491,7 +491,7 @@ function eliminarDelCarrito(index) {
  */
 function clearCart() {
     if (carrito.length === 0) return;
-    
+
     Swal.fire({
         title: '¿Limpiar carrito?',
         text: 'Se eliminarán todos los productos del carrito',
@@ -522,13 +522,13 @@ function openExpirationModal() {
 function cargarProductosVencimiento() {
     const tbody = document.getElementById('vencimientos-table-body');
     const productosVencimiento = productos.filter(p => p.por_vencer);
-    
+
     let html = '';
     productosVencimiento.forEach(producto => {
         const diasRestantes = calcularDiasRestantes(producto.fecha_vencimiento);
         const precioConDescuento = calcularPrecioConDescuento(producto);
         const porcentajeDescuento = Math.round((1 - precioConDescuento / producto.precio_venta) * 100);
-        
+
         html += `
             <tr>
                 <td class="ps-4">${producto.nombre}</td>
@@ -552,7 +552,7 @@ function cargarProductosVencimiento() {
             </tr>
         `;
     });
-    
+
     tbody.innerHTML = html || '<tr><td colspan="6" class="text-center text-muted">No hay productos próximos a vencer</td></tr>';
 }
 
@@ -571,7 +571,7 @@ function calcularDiasRestantes(fechaVencimiento) {
 function verificarProductosVencimiento() {
     const productosVencimiento = productos.filter(p => p.por_vencer);
     const badge = document.getElementById('expiration-badge');
-    
+
     if (productosVencimiento.length > 0) {
         badge.textContent = productosVencimiento.length;
         badge.style.display = 'block';
@@ -585,11 +585,11 @@ function verificarProductosVencimiento() {
  */
 function openPaymentModal() {
     if (carrito.length === 0) return;
-    
+
     document.getElementById('modal-total-pagar').textContent = `Q ${totalCarrito.toFixed(2)}`;
     document.getElementById('input-pago-recibido').value = '';
     document.getElementById('lbl-cambio').textContent = 'Q 0.00';
-    
+
     const modal = new bootstrap.Modal(document.getElementById('modalCobrar'));
     modal.show();
 }
@@ -599,7 +599,7 @@ function openPaymentModal() {
  */
 function togglePagoInput(metodo) {
     const seccionEfectivo = document.getElementById('seccion-efectivo');
-    
+
     if (metodo === 'efectivo') {
         seccionEfectivo.style.display = 'block';
     } else {
@@ -613,9 +613,9 @@ function togglePagoInput(metodo) {
 function calcularCambio() {
     const recibido = parseFloat(document.getElementById('input-pago-recibido').value) || 0;
     const cambio = recibido - totalCarrito;
-    
+
     document.getElementById('lbl-cambio').textContent = `Q ${Math.max(0, cambio).toFixed(2)}`;
-    
+
     if (cambio < 0) {
         document.getElementById('lbl-cambio').className = 'fw-bold text-danger';
     } else {
@@ -630,7 +630,7 @@ async function procesarVentaConfirmada() {
     const metodoPago = document.querySelector('input[name="metodoPago"]:checked').value;
     const clienteId = document.getElementById('select-cliente-venta').value;
     let recibido = totalCarrito; // Valor por defecto
-    
+
     if (metodoPago === 'efectivo') {
         recibido = parseFloat(document.getElementById('input-pago-recibido').value) || 0;
         if (recibido < totalCarrito) {
@@ -642,7 +642,7 @@ async function procesarVentaConfirmada() {
             return;
         }
     }
-    
+
     const ventaData = {
         cliente_id: clienteId,
         metodo_pago: metodoPago,
@@ -656,14 +656,14 @@ async function procesarVentaConfirmada() {
             subtotal: item.precio_actual * item.cantidad
         }))
     };
-    
+
     try {
         const apiBaseUrl = getApiBaseUrl();
         const url = window.location.origin + apiBaseUrl + 'api/ventas.php';
-        
+
         console.log('🔄 Procesando venta...', ventaData);
         console.log('📡 URL API:', url);
-        
+
         const response = await fetch(url, {
             method: 'POST',
             headers: {
@@ -671,31 +671,31 @@ async function procesarVentaConfirmada() {
             },
             body: JSON.stringify(ventaData)
         });
-        
+
         console.log('📡 Respuesta HTTP:', response.status);
-        
+
         const result = await response.json();
         console.log('📦 Resultado:', result);
-        
+
         if (result.success) {
             // Generar PDF de la factura
             generarFacturaPDF(result);
-            
+
             Swal.fire({
                 icon: 'success',
                 title: 'Venta Procesada',
                 text: `Venta #${result.venta_id} registrada exitosamente`,
                 timer: 2000
             });
-            
+
             // Limpiar carrito y cerrar modal
             carrito = [];
             actualizarCarrito();
             bootstrap.Modal.getInstance(document.getElementById('modalCobrar')).hide();
-            
+
             // Actualizar stock de productos
             cargarProductos();
-            
+
         } else {
             Swal.fire({
                 icon: 'error',
@@ -737,7 +737,7 @@ function generarFacturaPDF(ventaData) {
     // Usar la nueva versión HTML que funciona mejor
     const apiBaseUrl = getApiBaseUrl();
     const facturaUrl = window.location.origin + apiBaseUrl + `api/generar_factura_html.php?venta_id=${ventaData.venta_id}`;
-    
+
     // Abrir en nueva ventana
     window.open(facturaUrl, '_blank', 'width=500,height=700,scrollbars=yes');
 }
@@ -748,7 +748,7 @@ function generarFacturaPDF(ventaData) {
 function mostrarVistaPrevia(ventaData) {
     const fecha = new Date().toLocaleDateString('es-GT');
     const hora = new Date().toLocaleTimeString('es-GT');
-    
+
     const contenidoFactura = `
         <!DOCTYPE html>
         <html>
@@ -827,7 +827,7 @@ function mostrarVistaPrevia(ventaData) {
         </body>
         </html>
     `;
-    
+
     // Crear ventana para vista previa e impresión
     const ventana = window.open('', '_blank', 'width=800,height=600');
     ventana.document.write(contenidoFactura);

@@ -1,8 +1,7 @@
 <?php
-/**
- * api/actualizar_descuentos.php
- * Endpoint para actualizar descuentos de productos
- */
+
+// Endpoint para actualizar descuentos de productos
+
 ob_start();
 require_once __DIR__ . '/../config/db.php';
 ob_clean();
@@ -26,7 +25,7 @@ try {
         $id = (int) $item['id'];
         $descuento = (float) $item['descuento'];
 
-        // Actualizar el campo descuento_manual en la base de datos
+        // Actualiza el campo descuento_manual en la base de datos
         $sql = "UPDATE productos SET descuento_manual = :descuento WHERE id = :id";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([

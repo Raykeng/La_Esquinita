@@ -22,7 +22,7 @@ $usuarioActual = obtenerUsuarioActual();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La Esquinita - Sistema POS</title>
-    
+
     <!-- IMPORTANTE: Define la API base antes de cargar pos.js -->
     <script>
         // Calcula dinámicamente la ruta base
@@ -32,10 +32,10 @@ $usuarioActual = obtenerUsuarioActual();
             dirs.pop(); // Quita 'index.php'
             return '/' + dirs.join('/') + '/'; // Devuelve: /La_esquinita/La_Esquinita/
         })();
-        
+
         console.log('🔧 API Base URL:', API_BASE_URL); // Para debugging
     </script>
-    
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Template CSS Assets -->
@@ -65,7 +65,7 @@ $usuarioActual = obtenerUsuarioActual();
 
     <aside class="sidebar">
         <!-- Sidebar content will be loaded here -->
-        <?php include 'partials/sidebar.php'; ?>
+        <?php include 'includes/sidebar.php'; ?>
     </aside>
 
     <main class="dashboard-main">
@@ -76,31 +76,31 @@ $usuarioActual = obtenerUsuarioActual();
                 <?php
                 switch ($vista) {
                     case 'dashboard':
-                        include 'modulos/dashboard.php';
+                        include 'views/dashboard.php';
                         break;
                     case 'pos':
-                        include 'modulos/pos.php';
+                        include 'views/pos.php';
                         break;
                     case 'productos':
-                        include 'modulos/productos.php';
+                        include 'views/productos.php';
                         break;
                     case 'inventario':
-                        include 'modulos/inventario.php';
+                        include 'views/inventario.php';
                         break;
                     case 'clientes':
-                        include 'modulos/clientes.php';
+                        include 'views/clientes.php';
                         break;
                     case 'proveedores':
-                        include 'modulos/proveedores.php';
+                        include 'views/proveedores.php';
                         break;
                     case 'caja':
-                        include 'modulos/caja.php';
+                        include 'views/caja.php';
                         break;
                     case 'usuarios':
-                        include 'modulos/usuarios.php';
+                        include 'views/usuarios.php';
                         break;
                     case 'reportes':
-                        include 'modulos/reportes.php';
+                        include 'views/reportes.php';
                         break;
                     default:
                         echo "<h2>Error 404: Página no encontrada</h2>";
@@ -110,14 +110,14 @@ $usuarioActual = obtenerUsuarioActual();
             </div>
 
         </div>
-        
-        <?php include 'partials/footer.php'; ?>
+
+        <?php include 'includes/footer.php'; ?>
     </main>
 
     <!-- Scripts JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+
     <!-- Scripts específicos por vista -->
     <?php if ($vista === 'pos'): ?>
         <script>

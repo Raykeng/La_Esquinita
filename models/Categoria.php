@@ -1,8 +1,4 @@
 <?php
-/**
- * models/Categoria.php
- * Gestión de Categorías
- */
 require_once __DIR__ . '/../config/db.php';
 
 class Categoria

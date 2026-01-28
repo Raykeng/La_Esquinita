@@ -92,8 +92,15 @@ if (isset($_SESSION['usuario_id'])) {
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
@@ -123,12 +130,13 @@ if (isset($_SESSION['usuario_id'])) {
                 <div class="mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-1">
                         <label class="form-label mb-0">Contraseña</label>
-                        <a href="forgot-password.html" class="text-xs text-decoration-none">¿Olvidaste tu
+                        <a href="recuperar.php" class="text-xs text-decoration-none">¿Olvidaste tu
                             contraseña?</a>
                     </div>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                        <input type="password" class="form-control" id="password" placeholder="••••••••" value="password" required>
+                        <input type="password" class="form-control" id="password" placeholder="••••••••"
+                            value="password" required>
                     </div>
                 </div>
 
@@ -138,7 +146,7 @@ if (isset($_SESSION['usuario_id'])) {
                     </button>
                 </div>
             </form>
-            
+
             <div id="alertContainer" class="mt-3"></div>
         </div>
 
@@ -149,26 +157,26 @@ if (isset($_SESSION['usuario_id'])) {
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <script>
         // Manejar envío del formulario
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
             e.preventDefault();
-            
+
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value.trim();
             const btnLogin = document.getElementById('btnLogin');
             const btnText = document.getElementById('btnText');
-            
+
             if (!username || !password) {
                 mostrarAlerta('Por favor completa todos los campos', 'warning');
                 return;
             }
-            
+
             // Mostrar loading
             btnLogin.disabled = true;
             btnText.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Iniciando...';
-            
+
             try {
                 const response = await fetch('api/auth.php?action=login', {
                     method: 'POST',
@@ -177,19 +185,19 @@ if (isset($_SESSION['usuario_id'])) {
                     },
                     body: JSON.stringify({ username, password })
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (data.success) {
                     mostrarAlerta('¡Login exitoso! Redirigiendo...', 'success');
-                    
+
                     setTimeout(() => {
                         window.location.href = 'index.php';
                     }, 1000);
                 } else {
                     mostrarAlerta(data.message || 'Credenciales incorrectas', 'danger');
                 }
-                
+
             } catch (error) {
                 console.error('Error:', error);
                 mostrarAlerta('Error de conexión. Intenta nuevamente.', 'danger');
@@ -199,20 +207,20 @@ if (isset($_SESSION['usuario_id'])) {
                 btnText.innerHTML = 'INGRESAR';
             }
         });
-        
+
         // Mostrar alertas
         function mostrarAlerta(mensaje, tipo) {
             const container = document.getElementById('alertContainer');
-            const alertClass = tipo === 'success' ? 'alert-success' : 
-                              tipo === 'warning' ? 'alert-warning' : 'alert-danger';
-            
+            const alertClass = tipo === 'success' ? 'alert-success' :
+                tipo === 'warning' ? 'alert-warning' : 'alert-danger';
+
             container.innerHTML = `
                 <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
                     ${mensaje}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             `;
-            
+
             // Auto-ocultar después de 4 segundos
             setTimeout(() => {
                 const alert = container.querySelector('.alert');
@@ -221,17 +229,17 @@ if (isset($_SESSION['usuario_id'])) {
                 }
             }, 4000);
         }
-        
-        // Focus automático en el campo usuario
+
+        // Concentracion automático en el campo usuario
         document.getElementById('username').focus();
-        
-        // Enter en username pasa a password
-        document.getElementById('username').addEventListener('keypress', function(e) {
+
+        // Entrada en username pasa a password
+        document.getElementById('username').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 document.getElementById('password').focus();
             }
         });
-        
+
         // Datos de prueba para desarrollo
         console.log('Usuarios de prueba:');
         console.log('Admin: admin@laesquinita.com / password');

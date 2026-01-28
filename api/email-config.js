@@ -1,22 +1,16 @@
-/**
- * Configuración de EmailJS para La Esquinita
- * API gratuita para envío de emails
- */
 
 // Configuración de EmailJS (reemplaza con tus datos reales)
 const EMAIL_CONFIG = {
     SERVICE_ID: 'service_n364nyr', // Tu Service ID de Gmail
     TEMPLATE_ID: 'template_mx7ryeq', // Tu template de recuperación
     PUBLIC_KEY: 'cFDVZ8Smd9_ZJEk1q', // Tu Public Key de EmailJS
-    
+
     // Configuración del remitente
     FROM_NAME: 'La Esquinita - Sistema POS',
     FROM_EMAIL: 'noreply@laesquinita.com'
 };
 
-/**
- * Inicializar EmailJS
- */
+
 function initEmailJS() {
     // Cargar la librería de EmailJS si no está cargada
     if (typeof emailjs === 'undefined') {
@@ -77,13 +71,11 @@ async function sendPasswordResetEmail(userEmail, userName, resetToken, resetLink
     }
 }
 
-/**
- * Validar email format
- */
+
 function isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
 }
 
-// Inicializar cuando se carga la página
+
 document.addEventListener('DOMContentLoaded', initEmailJS);

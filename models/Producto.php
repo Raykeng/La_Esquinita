@@ -41,9 +41,7 @@ class Producto
         }
     }
 
-    /**
-     * Crear un nuevo producto
-     */
+
     public function crear($datos)
     {
         try {
@@ -79,9 +77,7 @@ class Producto
         }
     }
 
-    /**
-     * Actualizar un producto existente
-     */
+
     public function actualizar($id, $datos)
     {
         try {
